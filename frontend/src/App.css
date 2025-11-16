@@ -1,0 +1,51 @@
+/* frontend/src/App.css */
+.app-container {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background-color: #f4f4f4;
+  border-radius: 8px;
+}
+.error {
+  color: red;
+}
+.quiz-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.question-block {
+  background-color: #ffffff;
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.question-text {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+.options-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.option-label {
+  display: block;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.option-label:hover {
+  background-color: #e9e9e9;
+}
+button {
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+button:hover {
+  background-color: #0056b3;
+}
