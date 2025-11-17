@@ -4,7 +4,6 @@ import Result from './components/Result';
 import LoadingSpinner from './components/LoadingSpinner';
 import Question from './components/Question';
 
-// --- URL & Ikon ---
 const API_URL = 'http://localhost:5000/api/quiz';
 
 const ArrowRightIcon = () => (
@@ -13,7 +12,6 @@ const ArrowRightIcon = () => (
   </svg>
 );
 
-// --- IKON BARU UNTUK START PAGE ---
 const HeroIllustration = () => (
   <svg className="w-full h-full text-blue-600" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path fillRule="evenodd" clipRule="evenodd" d="M100 200C155.228 200 200 155.228 200 100C200 44.7715 155.228 0 100 0C44.7715 0 0 44.7715 0 100C0 155.228 44.7715 200 100 200ZM100 180C144.183 180 180 144.183 180 100C180 55.8172 144.183 20 100 20C55.8172 20 20 55.8172 20 100C20 144.183 55.8172 180 100 180Z" fill="url(#paint0_linear)"/>

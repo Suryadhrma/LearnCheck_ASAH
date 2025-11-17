@@ -1,10 +1,6 @@
 import React from 'react';
 import Question from './Question';
 
-/**
- * Komponen yang menampilkan seluruh daftar pertanyaan.
- * Komponen ini juga menampilkan tombol Submit.
- */
 function Quiz({ questions, userAnswers, onAnswerChange, onSubmit }) {
   
   // Hitung berapa banyak pertanyaan yang sudah dijawab
