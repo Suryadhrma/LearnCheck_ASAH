@@ -5,29 +5,20 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// --- KONFIGURASI AWAL ---
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// URL API Dicoding
 const DICODING_API_BASE_URL = "https://learncheck-dicoding-mock-666748076441.europe-west1.run.app/api";
 
-// Inisialisasi Gemini API
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const geminiModel = genAI.getGenerativeModel({
   model: "gemini-2.5-flash-preview-09-2025",
 });
 
-// Middlewares
 app.use(cors());
 app.use(express.json());
 
-// --- FUNGSI HELPER ---
-
-/**
- * Memanggil API Dicoding ASLI untuk mengambil konten materi
- */
 async function fetchMaterialFromDicoding(tutorialId) {
   const apiUrl = `${DICODING_API_BASE_URL}/tutorials/${tutorialId}`;
   console.log(`Memanggil API Dicoding ASLI di: ${apiUrl}`);
@@ -44,9 +35,6 @@ async function fetchMaterialFromDicoding(tutorialId) {
   }
 }
 
-/**
- * Membersihkan HTML dan mengambil teksnya saja
- */
 function cleanHtmlContent(htmlContent) {
   const $ = cheerio.load(htmlContent);
   const text = $('body').text().replace(/\s+/g, ' ').trim();
@@ -57,13 +45,9 @@ function cleanHtmlContent(htmlContent) {
   return text;
 }
 
-/**
- * Memanggil Gemini API untuk membuat kuis
- */
 async function generateQuizWithGemini(materialText) {
   console.log("Memanggil Gemini API untuk membuat soal...");
 
-  // === PERUBAHAN DI SINI: Schema di-upgrade untuk 'topic' ===
   const jsonSchema = {
     type: "OBJECT",
     properties: {
@@ -75,7 +59,6 @@ async function generateQuizWithGemini(materialText) {
           type: "OBJECT",
           properties: {
             id: { type: "NUMBER" },
-            // BARU: Tambahkan properti 'topic'
             topic: { 
               type: "STRING", 
               description: "Kategori/sub-topik dari soal ini, 1-3 kata. Cth: 'React Hooks'" 
@@ -91,9 +74,7 @@ async function generateQuizWithGemini(materialText) {
     },
     required: ["questions"]
   };
-  // ============================================
 
-  // === PERUBAHAN DI SINI: Instruksi di-upgrade untuk 'topic' ===
   const systemInstruction = `
     Anda adalah mesin pembuat kuis yang ahli untuk platform edukasi teknologi.
     Tugas Anda adalah membuat TEPAT 3 pertanyaan pilihan ganda (multiple choice) yang relevan dan mendalam berdasarkan teks materi yang diberikan.
@@ -105,17 +86,15 @@ async function generateQuizWithGemini(materialText) {
     4.  'answer' HARUS sama persis dengan salah satu teks di 'options'.
     5.  'explanation' harus menjelaskan mengapa jawaban itu benar, berdasarkan materi.
     6.  Respons HARUS dalam format JSON yang valid sesuai skema.
+    7.  Gaya soal harus berbeda dari yang sebelumnya tetapi materi tetap sama
   `;
-  // ==========================================================
 
-  // Konfigurasi model untuk meminta output JSON
   const generationConfig = {
     responseMimeType: "application/json",
     responseSchema: jsonSchema,
   };
 
   try {
-    // Kirim permintaan ke Gemini
     const result = await geminiModel.generateContent({
       contents: [{ role: "user", parts: [{ text: materialText }] }],
       systemInstruction: { parts: [{ text: systemInstruction }] },
@@ -132,7 +111,6 @@ async function generateQuizWithGemini(materialText) {
   }
 }
 
-// --- RUTE API UTAMA ---
 app.get('/api/quiz', async (req, res) => {
   const { tutorial_id } = req.query;
 
@@ -158,12 +136,10 @@ app.get('/api/quiz', async (req, res) => {
   }
 });
 
-// Server Cek
 app.get('/', (req, res) => {
-  res.send('Server Backend LearnCheck (Ultimate Version) Aktif!');
+  res.send('Server Backend LearnCheck Aktif!');
 });
 
-// Menjalankan server
 app.listen(PORT, () => {
   console.log(`Backend server berjalan di http://localhost:${PORT}`);
 });
