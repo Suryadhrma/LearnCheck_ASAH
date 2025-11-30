@@ -5,70 +5,77 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
+// --- KONFIGURASI AWAL ---
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 const DICODING_API_BASE_URL = "https://learncheck-dicoding-mock-666748076441.europe-west1.run.app/api";
 
+// Menggunakan Model Stabil
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const geminiModel = genAI.getGenerativeModel({
-  model: "gemini-2.5-flash-preview-09-2025",
+  model: "gemini-2.5-flash", // Menggunakan 1.5 flash yang lebih cepat/murah (atau tetap 2.5 jika akses ada)
 });
 
 app.use(cors());
 app.use(express.json());
 
+// --- FUNGSI HELPER ---
+
 async function fetchMaterialFromDicoding(tutorialId) {
   const apiUrl = `${DICODING_API_BASE_URL}/tutorials/${tutorialId}`;
-  console.log(`Memanggil API Dicoding ASLI di: ${apiUrl}`);
-  
+  console.log(`[Dicoding API] Fetching Material: ${apiUrl}`);
   try {
     const response = await axios.get(apiUrl);
     return response.data.data.content;
   } catch (error) {
-    console.error(`Error saat fetch materi dari Dicoding: ${error.message}`);
+    console.error(`Error fetch materi: ${error.message}`);
     if (error.response && error.response.status === 404) {
-      throw new Error(`Materi dengan tutorial_id ${tutorialId} tidak ditemukan di API Dicoding.`);
+      throw new Error(`Materi dengan tutorial_id ${tutorialId} tidak ditemukan.`);
     }
     throw new Error("Gagal mengambil materi dari API Dicoding.");
+  }
+}
+
+async function fetchUserPreferences(userId) {
+  const apiUrl = `${DICODING_API_BASE_URL}/users/${userId}/preferences`;
+  console.log(`[Dicoding API] Fetching Preferences: ${apiUrl}`);
+  try {
+    const response = await axios.get(apiUrl);
+    return response.data.data.preference;
+  } catch (error) {
+    console.warn(`Gagal mengambil preferensi user ${userId}, menggunakan default.`);
+    return { theme: 'light', fontSize: 'medium', layoutWidth: 'fullWidth' };
   }
 }
 
 function cleanHtmlContent(htmlContent) {
   const $ = cheerio.load(htmlContent);
   const text = $('body').text().replace(/\s+/g, ' ').trim();
-  console.log("Konten HTML sudah dibersihkan.");
-  if (!text) {
-    throw new Error("Konten materi kosong setelah dibersihkan.");
-  }
-  return text;
+  if (!text) throw new Error("Konten materi kosong setelah dibersihkan.");
+  return text.substring(0, 8000);
 }
 
 async function generateQuizWithGemini(materialText) {
-  console.log("Memanggil Gemini API untuk membuat soal...");
-
+  console.log("[Gemini AI] Generating Quiz...");
   const jsonSchema = {
     type: "OBJECT",
     properties: {
       questions: {
         type: "ARRAY",
-        minItems: 3, 
-        maxItems: 3, 
         items: {
           type: "OBJECT",
           properties: {
             id: { type: "NUMBER" },
-            topic: { 
-              type: "STRING", 
-              description: "Kategori/sub-topik dari soal ini, 1-3 kata. Cth: 'React Hooks'" 
-            },
+            type: { type: "STRING", enum: ["single", "multiple"] }, 
+            topic: { type: "STRING" },
             question: { type: "STRING" },
-            options: { type: "ARRAY", minItems: 4, maxItems: 4, items: { type: "STRING" } },
-            answer: { type: "STRING" },
+            options: { type: "ARRAY", items: { type: "STRING" } },
+            answer: { type: "ARRAY", items: { type: "STRING" } },
             explanation: { type: "STRING" }
           },
-          required: ["id", "topic", "question", "options", "answer", "explanation"]
+          required: ["id", "type", "topic", "question", "options", "answer", "explanation"]
         }
       }
     },
@@ -76,17 +83,13 @@ async function generateQuizWithGemini(materialText) {
   };
 
   const systemInstruction = `
-    Anda adalah mesin pembuat kuis yang ahli untuk platform edukasi teknologi.
-    Tugas Anda adalah membuat TEPAT 3 pertanyaan pilihan ganda (multiple choice) yang relevan dan mendalam berdasarkan teks materi yang diberikan.
-
-    ATURAN KETAT:
-    1.  Harus ada TEPAT 3 pertanyaan.
-    2.  Setiap pertanyaan harus memiliki TEPAT 4 opsi jawaban.
-    3.  Setiap pertanyaan HARUS memiliki 'topic' yang mengkategorikan soal (1-3 kata).
-    4.  'answer' HARUS sama persis dengan salah satu teks di 'options'.
-    5.  'explanation' harus menjelaskan mengapa jawaban itu benar, berdasarkan materi.
-    6.  Respons HARUS dalam format JSON yang valid sesuai skema.
-    7.  Gaya soal harus berbeda dari yang sebelumnya tetapi materi tetap sama
+  Anda adalah mesin pembuat kuis. Buat 3 soal berdasarkan materi dan pastikan setiap soal unik tetapi tetap berdasarkan materi.
+    
+    ATURAN PENTING:
+    1. Tentukan 'type' soal: "single" (jika hanya 1 jawaban benar) atau "multiple" (jika >1 jawaban benar).
+    2. Jika 'type' adalah "single", pastikan array 'answer' hanya berisi 1 string.
+    3. Jika 'type' adalah "multiple", array 'answer' berisi semua jawaban benar.
+    4. Buat variasi: Usahakan ada campuran soal single dan multiple jika materi memungkinkan.
   `;
 
   const generationConfig = {
@@ -100,45 +103,49 @@ async function generateQuizWithGemini(materialText) {
       systemInstruction: { parts: [{ text: systemInstruction }] },
       generationConfig: generationConfig,
     });
-
-    const responseText = result.response.text();
-    console.log("Soal (dengan topic) berhasil dibuat oleh Gemini.");
-    return JSON.parse(responseText);
-
+    return JSON.parse(result.response.text());
   } catch (error) {
-    console.error("Error saat memanggil Gemini:", error);
-    throw new Error("Gagal membuat soal dari Gemini. Cek API Key atau status model.");
+    console.error("Error Gemini:", error);
+    throw new Error("Gagal membuat soal dari Gemini.");
   }
 }
 
+// --- API ROUTES ---
+
+app.get('/api/preferences', async (req, res) => {
+  const { user_id } = req.query;
+  if (!user_id) return res.status(400).json({ error: 'user_id diperlukan' });
+
+  try {
+    const prefs = await fetchUserPreferences(user_id);
+    res.json(prefs);
+  } catch (error) {
+    res.status(500).json({ error: 'Gagal ambil preferensi' });
+  }
+});
+
 app.get('/api/quiz', async (req, res) => {
   const { tutorial_id } = req.query;
-
-  if (!tutorial_id) {
-    return res.status(400).json({ error: 'tutorial_id diperlukan' });
-  }
+  if (!tutorial_id) return res.status(400).json({ error: 'tutorial_id diperlukan' });
 
   try {
     const htmlContent = await fetchMaterialFromDicoding(tutorial_id);
     const materialText = cleanHtmlContent(htmlContent);
     const quizData = await generateQuizWithGemini(materialText);
 
-    const finalQuizObject = {
-      materialTitle: `Kuis untuk Materi ${tutorial_id}`,
+    const finalResponse = {
+      materialTitle: `Kuis Materi ${tutorial_id}`,
       ...quizData
     };
 
-    res.status(200).json(finalQuizObject);
-
+    res.status(200).json(finalResponse);
   } catch (error) {
-    console.error(`Error di rute /api/quiz untuk tutorial ${tutorial_id}:`, error.message);
-    res.status(500).json({ error: 'Gagal memproses permintaan kuis.', details: error.message });
+    console.error(`Error Handler:`, error.message);
+    res.status(500).json({ error: 'Gagal memproses permintaan.', details: error.message });
   }
 });
 
-app.get('/', (req, res) => {
-  res.send('Server Backend LearnCheck Aktif!');
-});
+app.get('/', (req, res) => res.send('Server Backend Ready!'));
 
 app.listen(PORT, () => {
   console.log(`Backend server berjalan di http://localhost:${PORT}`);

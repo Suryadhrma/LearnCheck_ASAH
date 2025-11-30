@@ -1,107 +1,145 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-// --- Ikon (Tidak berubah) ---
-const CheckIcon = () => (
-  <svg className="w-6 h-6 mr-3 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-  </svg>
-);
+const CheckIcon = () => <svg className="w-6 h-6 mr-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
+const XIcon = () => <svg className="w-6 h-6 mr-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
+const WarningIcon = () => <svg className="w-6 h-6 mr-3 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>;
 
-const XIcon = () => (
-  <svg className="w-6 h-6 mr-3 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-  </svg>
-);
-// -----------------------------
-
-// Komponen tombol keyakinan (Dipoles)
-const ConfidenceButton = ({ text, level, onClick, stagedConfidence }) => (
-  <button
-    onClick={() => onClick(level)}
-    className={`flex-1 text-sm font-medium py-3 px-3 rounded-lg border-2 transition-all duration-200
-                ${stagedConfidence === level
-                  ? 'bg-blue-600 text-white border-blue-600 shadow-lg' // Terpilih
-                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-blue-500' // Normal
-                }`}
-  >
-    {text}
-  </button>
-);
-
-
-function Question({ question, userAnswer, onAnswerSubmit }) {
+// LOGIC BARU: Menentukan Status Jawaban (Correct, Partial, Wrong)
+const getAnswerStatus = (userAnswer, correctAnswer) => {
+  if (!userAnswer || userAnswer.length === 0) return 'wrong';
   
-  const [stagedAnswer, setStagedAnswer] = useState(null);
+  // Hitung irisan (jawaban user yang ada di kunci jawaban)
+  const correctPicks = userAnswer.filter(ans => correctAnswer.includes(ans));
+  // Hitung jawaban ngawur (jawaban user yang TIDAK ada di kunci jawaban)
+  const wrongPicks = userAnswer.filter(ans => !correctAnswer.includes(ans));
+
+  // KONDISI 1: BENAR SEMPURNA (Semua benar dipilih, tidak ada yang salah)
+  if (correctPicks.length === correctAnswer.length && wrongPicks.length === 0) {
+    return 'correct';
+  }
+  
+  // KONDISI 2: SALAH TOTAL (Tidak ada satupun yang benar)
+  if (correctPicks.length === 0) {
+    return 'wrong';
+  }
+
+  // KONDISI 3: KURANG TEPAT (Ada yang benar, tapi ada yang salah ATAU kurang lengkap)
+  return 'partial';
+};
+
+const ConfidenceButton = ({ text, onClick, isSelected, colorBase, isDark }) => {
+  let bgClass = "";
+  const textClass = "text-white"; 
+
+  if (colorBase === 'yellow') {
+    bgClass = isSelected 
+      ? "bg-yellow-500 ring-4 ring-yellow-200" 
+      : "bg-yellow-400 hover:bg-yellow-500";
+    if (isDark && !isSelected) bgClass = "bg-yellow-600 hover:bg-yellow-500"; 
+  } else if (colorBase === 'green') {
+    bgClass = isSelected 
+      ? "bg-green-600 ring-4 ring-green-200" 
+      : "bg-green-500 hover:bg-green-600";
+    if (isDark && !isSelected) bgClass = "bg-green-700 hover:bg-green-600";
+  }
+
+  return (
+    <button
+      onClick={onClick}
+      className={`flex-1 text-base font-bold py-4 px-4 rounded-xl transition-all duration-200 transform shadow-md active:scale-95
+                  ${bgClass} ${textClass}`}
+    >
+      {text}
+    </button>
+  );
+};
+
+function Question({ question, userAnswer, onAnswerSubmit, isDark }) {
+  const [stagedAnswers, setStagedAnswers] = useState([]); 
   const [stagedConfidence, setStagedConfidence] = useState(null);
-  
-  const isAnswered = userAnswer !== null;
-  const isUserCorrect = userAnswer === question.answer;
+  const [showQuestion, setShowQuestion] = useState(false);
+
+  const isMultipleChoice = question.type === 'multiple';
+  const isAnswered = userAnswer !== null && userAnswer !== undefined;
+
+  // Tentukan Status Jawaban (correct / partial / wrong)
+  const answerStatus = isAnswered ? getAnswerStatus(userAnswer, question.answer) : null;
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowQuestion(true), 100);
+    return () => clearTimeout(timer);
+  }, [question]);
 
   const handleSelectAnswer = (option) => {
-    setStagedAnswer(option);
+    if (isAnswered) return;
+
+    setStagedAnswers(prev => {
+      if (isMultipleChoice) {
+        if (prev.includes(option)) return prev.filter(item => item !== option);
+        else return [...prev, option];
+      } else {
+        return [option];
+      }
+    });
     setStagedConfidence(null); 
   };
 
-  const handleSelectConfidence = (confidenceLevel) => {
-    setStagedConfidence(confidenceLevel);
-    onAnswerSubmit(question.id, stagedAnswer, confidenceLevel);
+  const handleSelectConfidence = (level) => {
+    setStagedConfidence(level);
+    onAnswerSubmit(question.id, stagedAnswers, level);
   };
 
+  const cardBg = isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-white';
+  const textPrimary = isDark ? 'text-gray-100' : 'text-gray-900';
+
+  // Tentukan warna border kartu berdasarkan status
+  let borderClass = "";
+  if (isAnswered) {
+    if (answerStatus === 'correct') borderClass = 'border-green-500';
+    else if (answerStatus === 'partial') borderClass = 'border-orange-400'; // Warna Oranye untuk Kurang Tepat
+    else borderClass = 'border-red-500';
+  }
 
   return (
-    // === DESAIN KARTU TERPADU (BARU) ===
-    // 'overflow-hidden' penting untuk menyatukan border-radius
-    <div className={`bg-white rounded-2xl shadow-2xl transition-all duration-500 border-4
-                   ${isAnswered ? (isUserCorrect ? 'border-green-300' : 'border-red-300') : 'border-white'}
-                   overflow-hidden`}
-    >
-      {/* Bagian Pertanyaan */}
+    <div className={`${cardBg} rounded-2xl shadow-2xl transition-all duration-500 border-4 overflow-hidden ${borderClass}`}>
+      
       <div className="p-6 sm:p-10">
+        <div className={`transition-all duration-500 ease-out ${showQuestion ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}>
+          {question.topic && (
+            <div className="mb-4 flex justify-between items-center">
+              <span className="inline-block bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 text-sm font-semibold px-4 py-1 rounded-full uppercase tracking-wider">
+                {question.topic}
+              </span>
+              <span className="text-xs font-bold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                {isMultipleChoice ? "☑️ Pilih Banyak Jawaban" : "🔘 Pilih Satu Jawaban"}
+              </span>
+            </div>
+          )}
+          <p className={`text-xl font-semibold mb-6 ${textPrimary}`}>{question.question}</p>
+        </div>
         
-        {/* Badge Topik */}
-        {question.topic && (
-          <div className="mb-4">
-            <span className="inline-block bg-blue-100 text-blue-800 text-sm font-semibold px-4 py-1 rounded-full uppercase tracking-wider">
-              {question.topic}
-            </span>
-          </div>
-        )}
-        
-        <p className="text-xl lg:text-2xl font-semibold text-gray-900 mb-6">
-          {question.question}
-        </p>
-        
-        {/* Opsi Jawaban (Dipoles) */}
         <div className="space-y-4">
           {question.options.map((option, index) => {
+            const isCorrectOption = question.answer.includes(option);
+            const isSelected = stagedAnswers.includes(option);
+            const isUserFinalChoice = isAnswered && userAnswer.includes(option);
             
-            const isCorrect = option === question.answer;
-            const isStaged = option === stagedAnswer;
-            const isUserChoice = option === userAnswer; 
-
             let styleClasses = "";
-            
+
             if (isAnswered) {
-              // --- Tampilan SETELAH dijawab (DIKUNCI) ---
-              if (isCorrect) {
-                // Jawaban Benar
-                styleClasses = "bg-green-50 border-green-500 text-green-800 ring-2 ring-green-200 scale-100";
-              } else if (isUserChoice) {
-                // Jawaban User (Salah)
-                styleClasses = "bg-red-50 border-red-500 text-red-800 ring-2 ring-red-200 scale-100";
+              if (isCorrectOption) {
+                // Jawaban Benar (Selalu Hijau)
+                styleClasses = isDark ? "bg-green-900/50 border-green-500 text-green-100" : "bg-green-50 border-green-500 text-green-800";
+              } else if (isUserFinalChoice && !isCorrectOption) {
+                // Jawaban User Salah (Merah)
+                styleClasses = isDark ? "bg-red-900/50 border-red-500 text-red-100" : "bg-red-50 border-red-500 text-red-800";
               } else {
-                // Opsi Lain (Pudar)
-                styleClasses = "bg-gray-50 border-gray-200 text-gray-500 opacity-60";
+                // Opsi lain
+                styleClasses = isDark ? "bg-gray-700 border-gray-600 text-gray-500 opacity-50" : "bg-gray-50 border-gray-200 text-gray-400 opacity-50";
               }
             } else {
-              // --- Tampilan SEBELUM dijawab ---
-              if (isStaged) {
-                // Jawaban Dipilih (Staged)
-                styleClasses = "bg-blue-50 border-blue-500 text-blue-800 ring-2 ring-blue-300 shadow-lg scale-[1.02]";
-              } else {
-                // Jawaban Normal (Hover dipoles)
-                styleClasses = "bg-white border-gray-300 text-gray-700 hover:border-blue-500 hover:shadow-lg hover:scale-[1.02] cursor-pointer";
-              }
+              if (isSelected) styleClasses = "bg-blue-600 border-blue-600 text-white shadow-lg scale-[1.02]";
+              else styleClasses = isDark ? "bg-gray-700 border-gray-600 text-gray-200 hover:border-blue-500" : "bg-white border-gray-300 text-gray-700 hover:border-blue-500";
             }
 
             return (
@@ -109,75 +147,90 @@ function Question({ question, userAnswer, onAnswerSubmit }) {
                 key={index}
                 onClick={() => handleSelectAnswer(option)}
                 disabled={isAnswered}
-                className={`flex items-center w-full p-5 border-2 rounded-lg 
-                            transition-all duration-300 text-left
-                            transform
-                            ${styleClasses}
-                            ${!isAnswered && !isStaged ? 'focus:outline-none focus:ring-2 focus:ring-blue-400' : ''}
-                            `}
+                className={`flex items-center w-full p-4 border-2 rounded-lg transition-all duration-200 text-left transform ${styleClasses}`}
+                style={{
+                  opacity: showQuestion ? 1 : 0,
+                  transform: showQuestion ? 'translateY(0)' : 'translateY(20px)',
+                  transitionDelay: `${100 + index * 50}ms`
+                }}
               >
-                {isAnswered && isCorrect && <CheckIcon />}
-                {isAnswered && isUserChoice && !isCorrect && <XIcon />}
-                {isAnswered && !isCorrect && !isUserChoice && <div className="w-6 h-6 mr-3 flex-shrink-0"></div>}
+                <div className={`w-5 h-5 flex-shrink-0 mr-4 flex items-center justify-center transition-colors border
+                  ${isMultipleChoice ? 'rounded' : 'rounded-full'} 
+                  ${isSelected || isUserFinalChoice ? 'bg-current border-transparent' : 'border-gray-400'}`}>
+                  
+                  {(isSelected || isUserFinalChoice) && (
+                    isMultipleChoice ? (
+                      <svg className={`w-3 h-3 text-white`} fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+                    ) : (
+                      <div className="w-2.5 h-2.5 bg-white rounded-full" />
+                    )
+                  )}
+                </div>
+
+                {isAnswered && isCorrectOption && <CheckIcon />}
+                {isAnswered && isUserFinalChoice && !isCorrectOption && <XIcon />}
                 
-                <span className="font-semibold text-base">{option}</span>
+                <span className="font-semibold text-base flex-1">{option}</span>
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Bagian Keyakinan & Penjelasan (Sekarang bagian dari kartu yang sama) */}
-      {(stagedAnswer || isAnswered) && (
-        <div className="bg-gray-50 p-6 sm:p-8 border-t border-gray-200">
-          
-          {/* 1. Tampilkan Kotak Keyakinan (jika belum dijawab) */}
-          {!isAnswered && stagedAnswer && (
+      {/* FOOTER */}
+      {(stagedAnswers.length > 0 || isAnswered) && (
+        <div className={`p-6 sm:p-8 border-t ${isDark ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+          {!isAnswered && stagedAnswers.length > 0 && (
             <div className="animate-fade-in-fast">
-              <h4 className="font-semibold text-center text-gray-700 mb-4">Seberapa yakin Anda dengan jawaban ini?</h4>
-              <div className="flex flex-col sm:flex-row gap-3">
+              <h4 className={`font-semibold text-center mb-4 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                Seberapa yakin Anda?
+              </h4>
+              <div className="flex gap-4">
                 <ConfidenceButton 
-                  text="Ragu-ragu" 
-                  level={0.5} 
-                  onClick={handleSelectConfidence} 
-                  stagedConfidence={stagedConfidence} 
+                    text="Ragu-ragu 🤔" 
+                    onClick={() => handleSelectConfidence(0.5)}
+                    isSelected={stagedConfidence === 0.5}
+                    colorBase="yellow"
+                    isDark={isDark}
                 />
                 <ConfidenceButton 
-                  text="Yakin" 
-                  level={1.0} 
-                  onClick={handleSelectConfidence} 
-                  stagedConfidence={stagedConfidence} 
+                    text="Yakin Banget! 🚀" 
+                    onClick={() => handleSelectConfidence(1.0)}
+                    isSelected={stagedConfidence === 1.0}
+                    colorBase="green"
+                    isDark={isDark}
                 />
               </div>
             </div>
           )}
 
-          {/* 2. Tampilkan Kotak Penjelasan (jika sudah dijawab) */}
-          <div 
-            className="transition-all duration-500"
-            style={{ 
-              maxHeight: isAnswered ? '500px' : '0', 
-              opacity: isAnswered ? 1 : 0, 
-              overflow: 'hidden' 
-            }}
-          >
+          <div className={`transition-all duration-500 ease-out overflow-hidden ${isAnswered ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
             {isAnswered && (
-              <div className={`p-5 rounded-lg border-l-4 
-                            ${isUserCorrect 
-                              ? 'bg-green-100 border-green-500' 
-                              : 'bg-red-100 border-red-500'
-                            }`}
-              >
-                <h4 className={`font-bold text-lg ${isUserCorrect ? 'text-green-800' : 'text-red-800'}`}>
-                  {isUserCorrect ? 'Jawaban Benar!' : 'Jawaban Salah'}
+              <div className={`p-5 rounded-lg border-l-4 mt-4 
+                ${answerStatus === 'correct' 
+                    ? (isDark ? 'bg-green-900/30 border-green-500' : 'bg-green-100 border-green-500') 
+                    : answerStatus === 'partial'
+                        ? (isDark ? 'bg-orange-900/30 border-orange-500' : 'bg-orange-100 border-orange-500') // Background Oranye untuk Partial
+                        : (isDark ? 'bg-red-900/30 border-red-500' : 'bg-red-100 border-red-500')}`}>
+                
+                <h4 className={`font-bold text-lg flex items-center
+                  ${answerStatus === 'correct' ? (isDark ? 'text-green-400' : 'text-green-800') 
+                  : answerStatus === 'partial' ? (isDark ? 'text-orange-400' : 'text-orange-800') // Text Oranye
+                  : (isDark ? 'text-red-400' : 'text-red-800')}`}>
+                  {answerStatus === 'correct' && 'Jawaban Benar! 🎉'}
+                  {answerStatus === 'partial' && <><WarningIcon /> Jawaban Kurang Tepat</>}
+                  {answerStatus === 'wrong' && 'Jawaban Salah 😅'}
                 </h4>
-                <p className={`text-base mt-1 ${isUserCorrect ? 'text-green-700' : 'text-red-700'}`}>
-                  {question.explanation || "Penjelasan tidak tersedia."}
+                
+                <p className={`text-base mt-2 leading-relaxed 
+                  ${answerStatus === 'correct' ? (isDark ? 'text-green-200' : 'text-green-700') 
+                  : answerStatus === 'partial' ? (isDark ? 'text-orange-200' : 'text-orange-800')
+                  : (isDark ? 'text-red-200' : 'text-red-700')}`}>
+                  {question.explanation}
                 </p>
               </div>
             )}
           </div>
-          
         </div>
       )}
     </div>
