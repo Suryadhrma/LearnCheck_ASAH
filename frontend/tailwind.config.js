@@ -4,6 +4,7 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}", // Memberitahu Tailwind file mana yang harus di-scan
   ],
+  darkMode: 'class',
   theme: {
     extend: {},
   },
