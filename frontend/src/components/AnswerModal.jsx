@@ -4,7 +4,7 @@ const AnswerModal = ({ isOpen, onClose, answerStatus, explanation, isDark }) => 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-500 bg-opacity-75">
-      <div className="bg-white dark:bg-gray-800 rounded-lg w-11/12 md:w-3/4 p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg w-11/12 md:w-3/4 lg:max-w-[800px] p-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-gray-800 dark:text-white">Feedback Jawaban</h2>
           <button onClick={onClose} className="text-gray-600 dark:text-white font-bold text-xl">
@@ -13,7 +13,7 @@ const AnswerModal = ({ isOpen, onClose, answerStatus, explanation, isDark }) => 
         </div>
 
         <div
-          className={`rounded p-3 leading-relaxed border-l-4 overflow-y-auto max-h-32 custom-scrollbar ${
+          className={`rounded p-3 leading-relaxed border-l-4 overflow-y-auto max-h-[300px] lg:max-h-[400px] w-full ${
             answerStatus === 'correct'
               ? isDark ? 'bg-green-900/30 border-green-500 text-green-200' : 'bg-green-50 border-green-500 text-green-800'
               : answerStatus === 'partial'

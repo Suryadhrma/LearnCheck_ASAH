@@ -15,17 +15,18 @@ const ArrowRightIcon = () => (<svg className="w-4 h-4 ml-1" fill="none" stroke="
 const FeatureCheckIcon = () => (<svg className="w-4 h-4 text-green-500 flex-shrink-0 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>);
 const ShieldCheckIcon = () => (<svg className="w-3 h-3 mr-1 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>);
 const LevelIcon = () => <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>;
+const ChartIcon = () => <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>;
 
-const HeroIllustration = () => (
-  <svg className="w-full h-full text-blue-600 drop-shadow-lg" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="100" cy="100" r="80" fill="url(#grad1)" fillOpacity="0.1" />
-    <path d="M70 130L100 70L130 130H70Z" fill="url(#grad2)" />
-    <defs>
-      <linearGradient id="grad1" x1="0" y1="0" x2="200" y2="200"><stop offset="0%" stopColor="#3B82F6"/><stop offset="100%" stopColor="#9333EA"/></linearGradient>
-      <linearGradient id="grad2" x1="70" y1="130" x2="130" y2="70"><stop offset="0%" stopColor="#3B82F6"/><stop offset="100%" stopColor="#2563EB"/></linearGradient>
-    </defs>
-  </svg>
-);
+// const HeroIllustration = () => (
+//   <svg className="w-full h-full text-blue-600 drop-shadow-lg" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+//     <circle cx="100" cy="100" r="80" fill="url(#grad1)" fillOpacity="0.1" />
+//     <path d="M70 130L100 70L130 130H70Z" fill="url(#grad2)" />
+//     <defs>
+//       <linearGradient id="grad1" x1="0" y1="0" x2="200" y2="200"><stop offset="0%" stopColor="#3B82F6"/><stop offset="100%" stopColor="#9333EA"/></linearGradient>
+//       <linearGradient id="grad2" x1="70" y1="130" x2="130" y2="70"><stop offset="0%" stopColor="#3B82F6"/><stop offset="100%" stopColor="#2563EB"/></linearGradient>
+//     </defs>
+//   </svg>
+// );
 
 function App() {
   // --- STATE MANAGEMENT ---
@@ -41,6 +42,7 @@ function App() {
   const [initLoading, setInitLoading] = useState(true);
   const [difficulty, setDifficulty] = useState('medium'); 
   const [history, setHistory] = useState([]);
+  const [showModal, setShowModal] = useState(false);
 
   // --- INITIALIZATION & SESSION RESTORE ---
   useEffect(() => {
@@ -131,14 +133,16 @@ function App() {
   }, [gameStatus]);
 
   // Handler Perubahan Preferensi dari Button
-  const handlePreferencesChange = (newPrefs, newUserId) => {
-    setPreferences(newPrefs);
-    setUserId(newUserId);
-    const url = new URL(window.location);
-    url.searchParams.set('user_id', newUserId);
-    window.history.pushState({}, '', url);
+  // const handlePreferencesChange = (newPrefs, newUserId) => {
+  //   setPreferences(newPrefs);
+  //   setUserId(newUserId);
+  //   const url = new URL(window.location);
+  //   url.searchParams.set('user_id', newUserId);
+  //   window.history.pushState({}, '', url);
+  // };
+  const toggleModal = () => {
+    setShowModal(!showModal);
   };
-
   const handleStartQuiz = async () => {
     setGameStatus('loading');
     setError(null);
@@ -212,11 +216,11 @@ function App() {
     <div className={wrapperClasses}>
       
       {/* TOMBOL PREFERENSI USER */}
-      <UserPreferencesButton 
+      {/* <UserPreferencesButton 
          onPreferencesChange={handlePreferencesChange} 
          currentUserId={userId}
          currentTutorialId={tutorialId}
-      />
+      /> */}
 
       {/* ERROR STATE */}
       {gameStatus === 'error' && (
@@ -255,37 +259,10 @@ function App() {
 
       {/* ACTIVE QUIZ STATE */}
       {gameStatus === 'active' && quizData && quizData.questions ? (
-        <div className="w-full max-w-4xl mx-auto p-3 sm:p-8 animate-fade-in flex flex-col h-full">
+        <div className="flex items-center justify-center p-4 lg:p-8 animate-fade-in h-full overflow-y-auto">
           {quizData.questions[currentQuestionIndex] ? (
             <>
-                {/* HEADER (FIXED) */}
-                <header className="flex-shrink-0 mb-4 sm:mb-6 border-b dark:border-gray-700 pb-2 pr-28">
-                    <div className="flex justify-between items-center mb-2">
-                    <div className="flex flex-col">
-                        <h1 className="text-sm font-bold truncate pr-2 max-w-[200px]">{quizData.materialTitle}</h1>
-                        <span className="text-[10px] opacity-70 capitalize flex items-center gap-1">
-                            User: {userId} • {difficulty}
-                        </span>
-                    </div>
-                    <div className="flex gap-2">
-                        {quizData.aiAudit && (
-                            <span className={`text-[10px] px-1.5 py-0.5 rounded border flex items-center
-                            ${isDark ? 'bg-green-900/30 border-green-700 text-green-400' : 'bg-green-50 border-green-200 text-green-700'}`}>
-                            <ShieldCheckIcon /> {quizData.aiAudit.score}%
-                            </span>
-                        )}
-                        <div className={`p-1 rounded-full border ${isDark ? 'border-gray-600 bg-gray-700' : 'border-gray-200 bg-white'}`}>
-                            {isDark ? <MoonIcon /> : <SunIcon />}
-                        </div>
-                    </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                    <div className={`flex-1 h-1.5 rounded-full overflow-hidden ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`}>
-                        <div className="h-full bg-blue-600 transition-all duration-300" style={{ width: `${((currentQuestionIndex + 1) / quizData.questions.length) * 100}%` }}></div>
-                    </div>
-                    <span className="text-[10px] font-mono opacity-70">{currentQuestionIndex + 1}/{quizData.questions.length}</span>
-                    </div>
-                </header>
+                
 
                 {/* MAIN CONTENT (SCROLLABLE) */}
                 <main className="flex-1 min-h-0 relative overflow-hidden flex flex-col"> 
@@ -313,7 +290,7 @@ function App() {
 
       {/* START PAGE */}
       {gameStatus === 'idle' && (
-        <div className="flex items-center justify-center p-4 lg:p-8 animate-fade-in h-full overflow-y-auto">
+        <div className="flex items-center justify-center p-4 lg:p-8 animate-fade-in h-full">
           <div className={`w-full max-w-5xl shadow-2xl rounded-xl overflow-hidden ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
             <div className="flex flex-col-reverse lg:flex-row">
               <div className="w-full lg:w-3/5 p-6 sm:p-12 flex flex-col justify-center">
@@ -353,13 +330,39 @@ function App() {
                 </button>
 
                 {/* CHART RIWAYAT BELAJAR */}
-                <HistoryChart history={history} isDark={isDark} />
+                <button 
+                  onClick={() => setShowModal(true)}  // Membuka modal
+                  className="fixed top-4 right-6 p-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 focus:outline-none"
+                >
+                  <ChartIcon />
+                </button>
+              {/* Tombol Chart untuk membuka modal */}
+              <button 
+                  onClick={toggleModal} // Membuka atau menutup modal
+                  className="fixed top-4 right-6 p-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 focus:outline-none"
+                >
+                  <ChartIcon />
+                </button>
 
               </div>
-              <div className="w-full lg:w-2/5 bg-gradient-to-r from-blue-50 to-indigo-100 dark:from-gray-700 dark:to-gray-800 p-6 flex items-center justify-center">
-                <div className="w-32 h-32 lg:w-64 lg:h-64"><HeroIllustration /></div>
-              </div>
+              
             </div>
+          </div>
+        </div>
+      )}
+{showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-500 bg-opacity-75">
+          <div className="bg-white dark:bg-gray-800 rounded-lg w-11/12 md:w-3/4 p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-gray-800 dark:text-white">Riwayat Belajar</h2>
+              <button
+                onClick={toggleModal} // Menutup modal
+                className="text-gray-600 dark:text-white font-bold text-xl"
+              >
+                &times; {/* Tombol Close */}
+              </button>
+            </div>
+            <HistoryChart history={history} isDark={preferences.theme === 'dark'} />
           </div>
         </div>
       )}
