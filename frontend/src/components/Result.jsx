@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import ResultModal from './ResultModal';
+const API_URL = 'http://localhost:5000/api';
 
 // HELPER LOGIC
 const getAnswerStatus = (userAnswer, correctAnswer) => {
@@ -20,7 +22,7 @@ const IconSalahYakin = () => <svg className="w-5 h-5 text-red-500" fill="none" s
 const SpeakerIcon = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>;
 const SpeakerWaveIcon = () => <svg className="w-4 h-4 animate-pulse text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>;
 const RobotIcon = () => <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>;
-
+const ChartIcon = () => <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>;
 // SUB-COMPONENTS
 const StatBox = ({ label, value, subLabel, isDark }) => (
   <div className={`flex-1 p-2 rounded-lg border flex flex-col items-center justify-center
@@ -62,28 +64,32 @@ const RecommendationItem = ({ question, userAnswer, status, isDark }) => {
     if (aiExplanation) return;
     setLoadingAi(true);
     try {
-        const res = await axios.post(`${API_URL}/explain`, {
-            question: question.question,
-            topic: question.topic,
-            userAnswer: formattedUserAnswer,
-            correctAnswer: formattedCorrect
-        });
-        setAiExplanation(res.data.explanation);
+      const res = await axios.post(`${API_URL}/explain`, {
+        question: question.question,
+        topic: question.topic,
+        userAnswer: formattedUserAnswer,
+        correctAnswer: formattedCorrect
+      });
+      setAiExplanation(res.data.explanation);
     } catch (err) {
-        setAiExplanation("Gagal menghubungi AI Tutor. Coba lagi nanti.");
+      setAiExplanation("Gagal menghubungi AI Tutor. Coba lagi nanti.");
     } finally {
-        setLoadingAi(false);
+      setLoadingAi(false);
     }
   };
 
   return (
-    <div className={`p-3 sm:p-4 rounded border-l-4 shadow-sm text-sm mb-2 ${borderColor} ${bgClass}`}>
+    <div className={`p-3 sm:p-4 rounded border-l-4 shadow-sm mb-2 ${borderColor} ${bgClass}`}>
       <div className="flex justify-between items-start mb-1">
-         <p className={`font-bold uppercase text-[10px] tracking-wider ${titleColor}`}>{titleText}</p>
+        <p className={`font-bold uppercase text-[10px] tracking-wider ${titleColor}`}>{titleText}</p>
       </div>
-      <p className={`font-semibold mb-2 leading-snug text-xs sm:text-sm ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>
+
+      {/* TEKS PERTANYAAN: ikut baseTextClass */}
+      <p className={`font-semibold mb-2 leading-snug ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>
         {question.question}
       </p>
+
+      {/* META PENJELASAN (kecil, tetap kecil) */}
       <div className={`text-[10px] sm:text-xs pt-2 border-t flex flex-col gap-1 ${isDark ? 'border-gray-600 text-gray-400' : 'border-gray-200 text-gray-500'}`}>
         <div><span className="font-bold">Jawaban Anda:</span> {formattedUserAnswer}</div>
         <div><span className="font-bold">Ket:</span> {question.explanation.substring(0, 100)}...</div>
@@ -91,18 +97,28 @@ const RecommendationItem = ({ question, userAnswer, status, isDark }) => {
 
       <div className="mt-3">
         {!aiExplanation && !loadingAi && (
-            <button onClick={handleAskAI} className="text-[10px] sm:text-xs font-bold flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 transition-colors">
-                <RobotIcon /> Bingung? Tanya AI Tutor
-            </button>
+          <button
+            onClick={handleAskAI}
+            className="text-[10px] sm:text-xs font-bold flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 transition-colors"
+          >
+            <RobotIcon /> Bingung? Tanya AI Tutor
+          </button>
         )}
-        {loadingAi && <div className="text-[10px] italic text-gray-500 animate-pulse mt-2">Sedang mengetik penjelasan... ✍️</div>}
+        {loadingAi && (
+          <div className="text-[10px] italic text-gray-500 animate-pulse mt-2">
+            Sedang mengetik penjelasan... ✍️
+          </div>
+        )}
         {aiExplanation && (
-            <div className="mt-3 p-3 bg-white dark:bg-gray-800 rounded-lg border border-blue-200 dark:border-gray-600 shadow-sm animate-fade-in">
-                <div className="flex items-center gap-2 mb-1 text-blue-600 dark:text-blue-400 font-bold text-[10px] uppercase tracking-wider">
-                    <RobotIcon /> Penjelasan AI Tutor
-                </div>
-                <p className="text-xs leading-relaxed text-gray-700 dark:text-gray-300">{aiExplanation}</p>
+          <div className="mt-3 p-3 bg-white dark:bg-gray-800 rounded-lg border border-blue-200 dark:border-gray-600 shadow-sm animate-fade-in">
+            <div className="flex items-center gap-2 mb-1 text-blue-600 dark:text-blue-400 font-bold text-[10px] uppercase tracking-wider">
+              <RobotIcon /> Penjelasan AI Tutor
             </div>
+            {/* PENJELASAN AI: ikut baseTextClass */}
+            <p className="leading-relaxed text-gray-700 dark:text-gray-300">
+              {aiExplanation}
+            </p>
+          </div>
         )}
       </div>
     </div>
@@ -116,6 +132,7 @@ function Result({ questions, userAnswers, confidenceScores, onRetry, isDark, dif
   const buckets = { benarYakin: [], benarRagu: [], partial: [], salah: [] };
   const [isSpeaking, setIsSpeaking] = useState(false);
   const saveRef = useRef(false);
+  const [showModal, setShowModal] = useState(false); // State untuk kontrol modal
 
   questions.forEach(q => {
     const uAnswer = userAnswers[q.id];
@@ -136,7 +153,6 @@ function Result({ questions, userAnswers, confidenceScores, onRetry, isDark, dif
   });
 
   const totalQuestions = questions.length;
-  // SAFEGUARD: Hindari NaN jika totalQuestions 0
   const scorePercentage = totalQuestions > 0 ? (score / totalQuestions) * 100 : 0;
   const avgConfidence = totalQuestions > 0 ? (totalConfidenceSum / totalQuestions) * 100 : 0;
   
@@ -145,20 +161,19 @@ function Result({ questions, userAnswers, confidenceScores, onRetry, isDark, dif
     ...buckets.partial.map(q => ({ ...q, answerStatus: 'partial' })),
     ...buckets.benarRagu.map(q => ({ ...q, answerStatus: 'review' }))
   ];
-
+ 
   // SAVE HISTORY (DIFFICULTY) 
   useEffect(() => {
     if (saveRef.current) return;
     saveRef.current = true;
 
-    // Pastikan nilai score aman
     const safeScore = isNaN(scorePercentage) ? 0 : Math.round(scorePercentage);
 
     const newEntry = {
-        date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }), // "4 Des"
-        score: safeScore,
-        difficulty: difficulty || 'medium', // Simpan difficulty
-        timestamp: Date.now()
+      date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }),
+      score: safeScore,
+      difficulty: difficulty || 'medium',
+      timestamp: Date.now()
     };
 
     const existingHistory = JSON.parse(localStorage.getItem('learncheck_history') || '[]');
@@ -194,33 +209,33 @@ function Result({ questions, userAnswers, confidenceScores, onRetry, isDark, dif
       setIsSpeaking(true);
     }
   };
-
+// Toggle modal open/close
+const toggleModal = () => {
+  setShowModal(!showModal);
+};
   return (
     <div className={`w-full h-screen flex flex-col p-3 sm:p-4 animate-fade-in overflow-hidden
                     ${isDark ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
       
-      <div className="flex-shrink-0 flex flex-col gap-3 mb-3">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-lg font-bold leading-none">Hasil Belajar</h1>
-            <p className={`text-[10px] ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-               Level: {difficulty} • Performa & Analisis
-            </p>
-          </div>
-        </div>
+      {/* Tombol untuk membuka modal */}
+      <button 
+  onClick={toggleModal}
+  className="top-3 right-8 w-10 h-10 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 focus:outline-none flex items-center justify-center mb-2"
+>
+  <ChartIcon className="w-5 h-5" />  {/* Ukuran ikon lebih kecil */}
+</button>
 
-        <div className="flex gap-2">
-          <StatBox label="Skor" value={`${scorePercentage.toFixed(0)}%`} isDark={isDark} />
-          <StatBox label="Keyakinan" value={`${avgConfidence.toFixed(0)}%`} isDark={isDark} />
-        </div>
 
-        <div className="grid grid-cols-4 gap-2">
-          <MatrixItem label="Paham" count={buckets.benarYakin.length} icon={<IconBenarYakin />} isDark={isDark} />
-          <MatrixItem label="Hoki" count={buckets.benarRagu.length} icon={<IconBenarRagu />} isDark={isDark} />
-          <MatrixItem label="Kurang" count={buckets.partial.length} icon={<WarningIcon />} isDark={isDark} />
-          <MatrixItem label="Salah" count={buckets.salah.length} icon={<IconSalahYakin />} isDark={isDark} />
-        </div>
-      </div>
+      {/* Modal Pop-up */}
+      {showModal && (
+        <ResultModal 
+          isDark={isDark} 
+          scorePercentage={scorePercentage} 
+          avgConfidence={avgConfidence} 
+          buckets={buckets} 
+          toggleModal={toggleModal} 
+        />
+      )}
 
       <div className="flex-1 min-h-0 flex flex-col border-t pt-2 border-gray-100 dark:border-gray-700">
         <h2 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2 flex-shrink-0">
@@ -229,21 +244,34 @@ function Result({ questions, userAnswers, confidenceScores, onRetry, isDark, dif
         
         <div className="overflow-y-auto pr-1 custom-scrollbar space-y-2 pb-16">
           {priorityList.map((q) => (
-              <RecommendationItem key={q.id} question={q} userAnswer={userAnswers[q.id]} status={q.answerStatus} isDark={isDark} />
+            <RecommendationItem
+              key={q.id}
+              question={q}
+              userAnswer={userAnswers[q.id]}
+              status={q.answerStatus}
+              isDark={isDark}
+            />
           ))}
           
           {priorityList.length === 0 && (
-             <div className="text-center py-4 opacity-50 text-sm">Semua jawaban sudah tepat & yakin! 🎉</div>
+            <div className="text-center py-4 opacity-50">
+              Semua jawaban sudah tepat & yakin! 🎉
+            </div>
           )}
 
           <div className={`mt-4 p-4 rounded-xl border border-dashed ${isDark ? 'bg-gray-700/30 border-gray-600' : 'bg-gray-50 border-gray-300'}`}>
             <div className="flex items-center justify-between mb-2">
               <h3 className="font-bold text-sm uppercase tracking-wide opacity-80">Ringkasan AI</h3>
-              <button onClick={handleToggleSummarySpeech} className={`p-1.5 rounded-full transition-all ${isSpeaking ? 'bg-blue-100 text-blue-600 animate-pulse' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`} title="Bacakan Ringkasan">
+              <button
+                onClick={handleToggleSummarySpeech}
+                className={`p-1.5 rounded-full transition-all ${isSpeaking ? 'bg-blue-100 text-blue-600 animate-pulse' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}
+                title="Bacakan Ringkasan"
+              >
                 {isSpeaking ? <SpeakerWaveIcon /> : <SpeakerIcon />}
               </button>
             </div>
-            <p className="text-xs sm:text-sm leading-relaxed italic opacity-90">"{summaryText}"</p>
+            {/* RINGKASAN AI: ikut baseTextClass */}
+            <p className="leading-relaxed italic opacity-90">"{summaryText}"</p>
           </div>
 
           <div className="mt-6 mb-8">

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-
+const API_URL = 'http://localhost:5000/api';
 // ICONS 
 const UserIcon = () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>;
 const ChevronUpIcon = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" /></svg>;
@@ -19,12 +19,12 @@ const UserPreferencesButton = ({ onPreferencesChange, currentUserId, currentTuto
 
   // List Tema User
   const themes = [
-    { id: 1, label: 'User 1', desc: 'Light • Medium', icon: <SunIcon /> },
-    { id: 2, label: 'User 2', desc: 'Dark • Medium', icon: <MoonIcon /> },
-    { id: 3, label: 'User 3', desc: 'Light • Large • Serif', icon: <SunIcon /> },
-    { id: 4, label: 'User 4', desc: 'Dark • XL', icon: <MoonIcon /> },
-    { id: 5, label: 'User 5', desc: 'Light • Small • Mono', icon: <SunIcon /> },
-    { id: 6, label: 'User 6', desc: 'Dark • Serif', icon: <MoonIcon /> },
+    { id: 1, label: 'User 1', desc: 'Dark • Default • Full • Medium', icon: <MoonIcon /> },
+    { id: 2, label: 'User 2', desc: 'Light • Serif • Full • Large', icon: <SunIcon /> },
+    { id: 3, label: 'User 3', desc: 'Dark • Dyslexic • Full • Large', icon: <MoonIcon /> },
+    { id: 4, label: 'User 4', desc: 'Light • Default • Medium • Small', icon: <SunIcon /> },
+    { id: 5, label: 'User 5', desc: 'Dark • Serif • Medium • Medium', icon: <MoonIcon /> },
+    { id: 6, label: 'User 6', desc: 'Light • Dyslexic • Medium • Large', icon: <SunIcon /> },
   ];
 
   const handleSelectTheme = async (themeId) => {

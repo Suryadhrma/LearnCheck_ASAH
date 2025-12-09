@@ -10,7 +10,7 @@ function LoadingSpinner({ isDark }) {
       <p className={`mt-6 text-xl font-medium tracking-wide ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
         Menganalisis Materi & Membuat Soal Kuis...
       </p>
-      <p className={`mt-2 text-base ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
+      <p className={`mt-2 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
         AI sedang bekerja. Mohon tunggu sebentar.
       </p>
     </div>
