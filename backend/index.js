@@ -23,28 +23,14 @@ app.use(express.json());
 
 // Fetch User Preferences (Logic Sederhana: Cek string 'dark')
 async function fetchUserPreferences(userId) {
-  // MOCK MODE
-  if (!DICODING_API_BASE_URL) {
-    console.log(`[Mock Mode] Simulasi preferensi untuk User: ${userId}`);
-    
-    // Jika ID mengandung kata 'dark', set tema gelap. Contoh: 'user-dark'
-    const isDarkUser = userId && userId.toLowerCase().includes('dark');
-    
-    return { 
-      theme: isDarkUser ? 'dark' : 'light', 
-      fontSize: 'medium', 
-      layoutWidth: 'fullWidth' 
-    };
-  }
-
-  // REAL API MODE
+    // REAL API MODE
   const apiUrl = `${DICODING_API_BASE_URL}/users/${userId}/preferences`;
   try {
     const response = await axios.get(apiUrl);
     return response.data.data.preference;
   } catch (error) {
     console.warn(`Gagal mengambil preferensi, fallback default.`);
-    return { theme: 'light', fontSize: 'medium', layoutWidth: 'fullWidth' };
+    return { theme: 'light', fontSize: 'medium',fontType: 'default', layoutWidth: 'fullWidth' };
   }
 }
 
