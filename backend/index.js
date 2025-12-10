@@ -18,7 +18,7 @@ const groq = new Groq({
 });
 
 // Model llm
-const AI_MODEL = "llama-3.3-70b-versatile";
+const AI_MODEL = "openai/gpt-oss-120b";
 
 app.use(cors());
 app.use(express.json());
