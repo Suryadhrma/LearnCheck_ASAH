@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="public/logo.svg" alt="LearnCheck AI Logo" width="150"/>
+  <img src="logo.svg" alt="LearnCheck AI Logo" width="150"/>
   <h1><b>LearnCheck AI : Platform Evaluasi Belajar Cerdas & Adaptif</b></h1>
 </div>
 
