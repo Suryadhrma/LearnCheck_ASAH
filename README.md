@@ -110,12 +110,12 @@ Menilai bukan hanya "benar atau salah", tapi juga tingkat keyakinan (Confidence 
 ♿ Accessibility First
 Dyslexia Friendly: Dukungan font khusus untuk penderita disleksia.
 
-Question Difficulty
+🟩/🟥Question Difficulty
 User dapat memilih tingkat kesulitan soal di tiap materi berdasarkan keinginannya.
 
-Text-to-Speech (TTS): Fitur pembacaan soal otomatis.
+🔊Text-to-Speech (TTS): Fitur pembacaan soal otomatis.
 
-Adaptive UI: Dark Mode & Light Mode, serta pengaturan ukuran font yang dinamis.
+🌗Adaptive UI: Dark Mode & Light Mode, serta pengaturan ukuran font yang dinamis.
 
 📊 Comprehensive Analytics
 Visualisasi progress belajar menggunakan grafik riwayat dan breakdown analisis per soal.
@@ -130,26 +130,32 @@ Visualisasi progress belajar menggunakan grafik riwayat dan breakdown analisis p
 
 ### Built With 🛠
 Frontend
-React - Library JavaScript untuk antarmuka pengguna.
+[React] (https://react.dev/) - Library JavaScript untuk antarmuka pengguna.
 
-Vite - Build tool frontend generasi berikutnya.
+[Vite] (https://vite.dev/) - Build tool frontend generasi berikutnya.
 
-Tailwind CSS - Framework CSS utility-first untuk styling cepat.
+[Tailwind CSS] (https://tailwindcss.com/) - Framework CSS utility-first untuk styling cepat.
 
-Axios - HTTP Client untuk request ke backend.
+[Axios] (https://axios-http.com/) - HTTP Client untuk request ke backend.
 
 Backend
-Express.js - Framework web minimalis untuk Node.js.
+[Express.js] (https://expressjs.com/) - Framework web minimalis untuk Node.js.
 
-Groq SDK - Integrasi High-performance AI inference (Llama-3).
+[Groq SDK] (https://console.groq.com/) - Integrasi High-performance AI inference (Llama-3).
 
-Cheerio - Scraping dan parsing konten HTML materi.
+[Cheerio] (https://cheerio.js.org/) - Scraping dan parsing konten HTML materi.
 
-Cors & Dotenv - Keamanan dan manajemen konfigurasi.
+[Cors & Dotenv] (https://www.npmjs.com/) - Keamanan dan manajemen konfigurasi.
 
 ---
 
 ### Contact
 Project ini dibuat sebagai bagian dari tugas Capstone Project. Jika ada pertanyaan, silakan hubungi tim kami melalui GitHub profile masing-masing.
 
-Happy Learning! 🚀
+Visit:
+- [Suryadhrma git's](https://github.com/Suryadhrma)
+- [WansXNeo git's](https://github.com/WansXNeo)
+- [luckyferd git's](https://github.com/luckyferd)
+- [Geriii4 git's](https://github.com/Geriii4)
+- [leoooooooooo1 git's](https://github.com/leoooooooooo1)
+
