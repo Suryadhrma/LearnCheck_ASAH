@@ -61,6 +61,8 @@ npm run dev
 ```
 Akses aplikasi melalui browser di http://localhost:5173.
 
+---
+
 ### Usage
 How to Start a Quiz
 Pilih Tingkat Kesulitan:
@@ -96,6 +98,8 @@ Matriks Pemahaman:
 
 Rekomendasi: Daftar soal yang perlu ditinjau ulang beserta penjelasan AI.
 
+---
+
 ### Features
 🧠 AI-Powered Quiz Generation
 Menggunakan Llama-3 via Groq untuk membuat soal otomatis dari materi pembelajaran. Backend dilengkapi sistem AI Audit untuk memastikan kualitas soal sebelum ditampilkan ke user.
@@ -113,7 +117,12 @@ Adaptive UI: Dark Mode & Light Mode, serta pengaturan ukuran font yang dinamis.
 📊 Comprehensive Analytics
 Visualisasi progress belajar menggunakan grafik riwayat dan breakdown analisis per soal.
 
+---
+
 ### 📸 Screenshots
+
+
+---
 
 
 ### Built With 🛠
@@ -134,6 +143,8 @@ Groq SDK - Integrasi High-performance AI inference (Llama-3).
 Cheerio - Scraping dan parsing konten HTML materi.
 
 Cors & Dotenv - Keamanan dan manajemen konfigurasi.
+
+---
 
 ### Contact
 Project ini dibuat sebagai bagian dari tugas Capstone Project. Jika ada pertanyaan, silakan hubungi tim kami melalui GitHub profile masing-masing.
