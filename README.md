@@ -11,11 +11,11 @@
 
 | Name | Bangkit-ID | Role |
 | :--- | :--- | :--- |
-| **Gericho Chandra Diva Pratama Hutagalung** | R429D5Y0684 | React / Frontend Dev |
+| **Gericho Chandra Diva Pratama Hutagalung** | R429D5Y0684 | UI/UX & Styling |
 | **Lucky Ferdiansyah** | R429D5Y1006 | React / Frontend Dev |
 | **Mochammad Rifiq Surya Mulya Zarkasi** | R429D5Y1126 | Backend / AI Engineer |
 | **M.Surya Dharma Khazinatul Azror** | R429D5Y1047 | Backend / AI Engineer |
-| **Arya Leo Anggara** | R429D5Y0286 | UI/UX & Styling |
+| **Arya Leo Anggara** | R429D5Y0286 | React / Frontend Dev |
 
 ---
 
