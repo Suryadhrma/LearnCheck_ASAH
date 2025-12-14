@@ -4,6 +4,7 @@ import { API_URL } from './config';
 import Result from './components/Result';
 import LoadingSpinner from './components/LoadingSpinner';
 import Question from './components/Question';
+import assets from '../public/logo.svg';
 
 // ICONS SVG (Compact)
 const SunIcon = () => (<svg className="w-4 h-4 text-amber-500 drop-shadow-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>);
@@ -14,14 +15,11 @@ const LevelIcon = () => <svg className="w-4 h-4 mr-2 opacity-80" fill="none" str
 const ChartIcon = () => <svg className="w-3.5 h-3.5 mr-2 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>;
 
 const HeroIllustration = () => (
-  <svg className="w-full h-full text-blue-600 drop-shadow-[0_8px_16px_rgba(37,99,235,0.3)] dark:drop-shadow-[0_8px_16px_rgba(37,99,235,0.5)] transition-all duration-500" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="100" cy="100" r="80" fill="url(#grad1)" fillOpacity="0.15" className="animate-pulse-slow"/>
-    <path d="M70 130L100 70L130 130H70Z" fill="url(#grad2)" />
-    <defs>
-      <linearGradient id="grad1" x1="0" y1="0" x2="200" y2="200"><stop offset="0%" stopColor="#3B82F6"/><stop offset="100%" stopColor="#9333EA"/></linearGradient>
-      <linearGradient id="grad2" x1="70" y1="130" x2="130" y2="70"><stop offset="0%" stopColor="#3B82F6"/><stop offset="100%" stopColor="#2563EB"/></linearGradient>
-    </defs>
-  </svg>
+  <img 
+    src={assets} 
+    alt="LearnCheck Logo"
+    className="w-full h-full object-contain drop-shadow-[0_8px_16px_rgba(37,99,235,0.3)] dark:drop-shadow-[0_8px_16px_rgba(37,99,235,0.5)] transition-all duration-500 animate-pulse-slow"
+  />
 );
 
 const HistoryChart = ({ history, isDark }) => {
