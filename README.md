@@ -45,3 +45,97 @@ npm install
 
 # Jalankan Server
 node index.js
+```
+### 2. Setup Frontend (Client)
+Frontend dibangun menggunakan React + Vite dengan styling Tailwind CSS.
+
+```bash
+# Masuk ke folder frontend (terminal baru)
+cd frontend
+
+# Install dependencies
+npm install
+
+# Jalankan mode development
+npm run dev
+```
+Akses aplikasi melalui browser di http://localhost:5173.
+
+### Usage
+How to Start a Quiz
+Pilih Tingkat Kesulitan:
+
+Mudah: Fokus pada pemahaman dasar (Recall & Understand).
+
+Sulit: Fokus pada studi kasus dan analisis (Analyze & Evaluate).
+
+Mulai Kuis:
+
+Klik tombol "Mulai Sekarang". Aplikasi akan mengambil materi dari sumber belajar dan AI akan men-generate soal secara real-time.
+
+Jawab Pertanyaan:
+
+Pilih jawaban yang menurut Anda benar.
+
+Confidence Check: Tentukan apakah Anda "Sangat Yakin" atau "Masih Ragu". Ini mempengaruhi analisis akhir.
+
+Understanding the Result
+Setelah kuis selesai, Anda akan mendapatkan laporan analisis:
+
+Skor Akhir: Persentase jawaban benar.
+
+Matriks Pemahaman:
+
+ Paham: Jawaban benar & yakin.
+
+ Hoki: Jawaban benar tapi ragu (perlu dipelajari lagi).
+
+ Kurang Tepat: Jawaban hampir benar (parsial).
+
+ Salah: Jawaban salah & yakin (miskonsepsi).
+
+Rekomendasi: Daftar soal yang perlu ditinjau ulang beserta penjelasan AI.
+
+### Features
+🧠 AI-Powered Quiz Generation
+Menggunakan Llama-3 via Groq untuk membuat soal otomatis dari materi pembelajaran. Backend dilengkapi sistem AI Audit untuk memastikan kualitas soal sebelum ditampilkan ke user.
+
+🎯 Metacognitive Assessment
+Menilai bukan hanya "benar atau salah", tapi juga tingkat keyakinan (Confidence Score). Membantu user menyadari area di mana mereka hanya "menebak".
+
+♿ Accessibility First
+Dyslexia Friendly: Dukungan font khusus untuk penderita disleksia.
+
+Text-to-Speech (TTS): Fitur pembacaan soal otomatis.
+
+Adaptive UI: Dark Mode & Light Mode, serta pengaturan ukuran font yang dinamis.
+
+📊 Comprehensive Analytics
+Visualisasi progress belajar menggunakan grafik riwayat dan breakdown analisis per soal.
+
+### 📸 Screenshots
+
+
+### Built With 🛠
+Frontend
+React - Library JavaScript untuk antarmuka pengguna.
+
+Vite - Build tool frontend generasi berikutnya.
+
+Tailwind CSS - Framework CSS utility-first untuk styling cepat.
+
+Axios - HTTP Client untuk request ke backend.
+
+Backend
+Express.js - Framework web minimalis untuk Node.js.
+
+Groq SDK - Integrasi High-performance AI inference (Llama-3).
+
+Cheerio - Scraping dan parsing konten HTML materi.
+
+Cors & Dotenv - Keamanan dan manajemen konfigurasi.
+
+### Contact
+Project ini dibuat sebagai bagian dari tugas Capstone Project. Jika ada pertanyaan, silakan hubungi tim kami melalui GitHub profile masing-masing.
+
+Happy Learning! 🚀
