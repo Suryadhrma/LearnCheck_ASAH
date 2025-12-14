@@ -110,6 +110,9 @@ Menilai bukan hanya "benar atau salah", tapi juga tingkat keyakinan (Confidence 
 ♿ Accessibility First
 Dyslexia Friendly: Dukungan font khusus untuk penderita disleksia.
 
+Question Difficulty
+User dapat memilih tingkat kesulitan soal di tiap materi berdasarkan keinginannya.
+
 Text-to-Speech (TTS): Fitur pembacaan soal otomatis.
 
 Adaptive UI: Dark Mode & Light Mode, serta pengaturan ukuran font yang dinamis.
