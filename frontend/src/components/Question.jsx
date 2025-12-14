@@ -1,42 +1,74 @@
-import React, { useState, useEffect } from 'react';
+// frontend/src/components/Question.jsx
 
-// ICONS SVG 
-const CheckIcon = () => <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>;
-const XIcon = () => <svg className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg>;
-const WarningIcon = () => <svg className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>;
+import React, { useState, useEffect, useMemo } from 'react';
 
-// Icon Speaker (Suara Mati)
+// ICONS SVG
+const CheckIcon = () => <svg className="w-5 h-5 text-emerald-500 flex-shrink-0 drop-shadow-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>;
+const XIcon = () => <svg className="w-5 h-5 text-rose-500 flex-shrink-0 drop-shadow-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg>;
+const WarningIcon = () => <svg className="w-5 h-5 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>;
 const SpeakerIcon = () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>;
-// Icon Speaker Wave (Suara Hidup)
 const SpeakerWaveIcon = () => <svg className="w-5 h-5 animate-pulse text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>;
-// Icon Lampu (Hint)
 const LightBulbIcon = () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m12.728 0l-.707.707M12 21v-1m-6.364-1.636l.707-.707M6.343 6.343l.707.707m12.728 0l.707.707M12 5a7 7 0 100 14 7 7 0 000-14z" /></svg>;
 
-// HELPER FUNCTIONS
+// DATA FEEDBACK
+const FEEDBACK_MESSAGES = {
+  correct: [
+    "🎉 Mantap! Jawaban Anda tepat sekali.",
+    "🌟 Luar biasa! Pemahaman Anda sangat baik.",
+    "🔥 Keren! Lanjutkan momentum ini.",
+    "✅ Tepat sasaran! Kerja bagus.",
+    "🤩 Sempurna! Anda menguasai materi ini."
+  ],
+  partial: [
+    "🤏 Hampir benar! Tapi masih ada opsi yang terlewat.",
+    "⚠️ Sedikit lagi! Jawaban Anda belum lengkap.",
+    "🤔 Cukup oke, tapi coba cek lagi opsi lainnya.",
+    "👀 Teliti lagi ya, masih ada bagian yang kurang."
+  ],
+  wrong: [
+    "😅 Ups, kurang tepat. Yuk coba pelajari lagi!",
+    "💪 Tidak apa-apa salah, yang penting belajar.",
+    "    Belum benar. Jadikan ini pelajaran untuk lebih paham.",
+    "📉 Jangan menyerah! Coba baca lagi materinya.",
+    "🧐 Coba perhatikan petunjuk (Hint) yang ada."
+  ]
+};
+
+const getRandomMessage = (status) => {
+  const messages = FEEDBACK_MESSAGES[status] || FEEDBACK_MESSAGES.wrong;
+  return messages[Math.floor(Math.random() * messages.length)];
+};
+
 const getAnswerStatus = (userAnswer, correctAnswer) => {
   if (!userAnswer || userAnswer.length === 0) return 'wrong';
   const correctPicks = userAnswer.filter(ans => correctAnswer.includes(ans));
   const wrongPicks = userAnswer.filter(ans => !correctAnswer.includes(ans));
-  // Status: Benar Sempurna, Salah Total, atau Partial
   if (correctPicks.length === correctAnswer.length && wrongPicks.length === 0) return 'correct';
   if (correctPicks.length === 0) return 'wrong';
   return 'partial';
 };
 
-// SUB-COMPONENT: TOMBOL CONFIDENCE
+// SUB-COMPONENT: CONFIDENCE BUTTON
 const ConfidenceButton = ({ text, onClick, isSelected, colorBase, isDark }) => {
-  let bgClass = "";
-  // Styling tombol berdasarkan warna (Kuning/Hijau) dan mode (Dark/Light)
+  let baseClasses = "flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 transform active:scale-95 shadow-sm border border-transparent";
+  let activeClasses = "";
+
   if (colorBase === 'yellow') {
-    bgClass = isSelected ? "bg-yellow-500 ring-2 ring-yellow-200" : "bg-yellow-400 hover:bg-yellow-500";
-    if (isDark && !isSelected) bgClass = "bg-yellow-700 hover:bg-yellow-600"; 
+    activeClasses = isSelected 
+      ? "bg-amber-400 text-amber-900 shadow-amber-400/50 ring-2 ring-amber-200 scale-[1.02]" 
+      : isDark 
+        ? "bg-amber-900/30 text-amber-200 border-amber-800/50 hover:bg-amber-900/50 hover:border-amber-700" 
+        : "bg-amber-100 text-amber-700 border-amber-200 hover:bg-amber-200";
   } else {
-    bgClass = isSelected ? "bg-green-600 ring-2 ring-green-200" : "bg-green-500 hover:bg-green-600";
-    if (isDark && !isSelected) bgClass = "bg-green-700 hover:bg-green-600";
+    activeClasses = isSelected 
+      ? "bg-emerald-500 text-white shadow-emerald-500/50 ring-2 ring-emerald-200 scale-[1.02]" 
+      : isDark 
+        ? "bg-emerald-900/30 text-emerald-200 border-emerald-800/50 hover:bg-emerald-900/50 hover:border-emerald-700" 
+        : "bg-emerald-100 text-emerald-700 border-emerald-200 hover:bg-emerald-200";
   }
 
   return (
-    <button onClick={onClick} className={`flex-1 py-2 sm:py-3 px-2 rounded-lg text-xs sm:text-sm font-bold text-white transition-all transform active:scale-95 ${bgClass}`}>
+    <button onClick={onClick} className={`${baseClasses} ${activeClasses}`}>
       {text}
     </button>
   );
@@ -44,166 +76,200 @@ const ConfidenceButton = ({ text, onClick, isSelected, colorBase, isDark }) => {
 
 // MAIN COMPONENT
 function Question({ question, userAnswer, onAnswerSubmit, isDark }) {
-  // State Management
   const [stagedAnswers, setStagedAnswers] = useState([]); 
   const [stagedConfidence, setStagedConfidence] = useState(null);
   const [showQuestion, setShowQuestion] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [showHint, setShowHint] = useState(false); // Toggle Hint
+  const [showHint, setShowHint] = useState(false); 
 
   const isMultipleChoice = question.type === 'multiple';
   const isAnswered = userAnswer !== null && userAnswer !== undefined;
   const answerStatus = isAnswered ? getAnswerStatus(userAnswer, question.answer) : null;
 
-  // Efek Animasi & Cleanup saat pindah soal
+  const feedbackText = useMemo(() => {
+    if (!isAnswered || !answerStatus) return "";
+    return getRandomMessage(answerStatus);
+  }, [isAnswered, answerStatus]); 
+
   useEffect(() => {
     setShowQuestion(false);
-    const timer = setTimeout(() => setShowQuestion(true), 50);
-    
-    // Reset semua state interaksi
+    const timer = setTimeout(() => setShowQuestion(true), 100); // Sedikit delay agar animasi halus
     return () => {
       clearTimeout(timer);
-      window.speechSynthesis.cancel(); // Matikan suara
+      window.speechSynthesis.cancel();
       setIsSpeaking(false);
-      setShowHint(false); // Tutup hint
+      setShowHint(false);
     };
   }, [question]);
 
-  // Logic Text-to-Speech (Membaca Soal + Opsi)
   const handleToggleSpeech = () => {
     if (isSpeaking) {
       window.speechSynthesis.cancel();
       setIsSpeaking(false);
     } else {
-      // Gabungkan Soal + Opsi dengan jeda
       const optionsText = question.options.join('. '); 
       const fullText = `${question.question}. Pilihan jawaban adalah: ${optionsText}`;
-      
       const utterance = new SpeechSynthesisUtterance(fullText);
-      utterance.lang = 'id-ID'; // Bahasa Indonesia
-      utterance.rate = 0.9;     // Kecepatan baca sedikit lambat
-      
+      utterance.lang = 'id-ID'; 
+      utterance.rate = 0.9; 
       utterance.onend = () => setIsSpeaking(false);
       utterance.onerror = () => setIsSpeaking(false);
-
       window.speechSynthesis.cancel(); 
       window.speechSynthesis.speak(utterance);
       setIsSpeaking(true);
     }
   };
 
-  // Logic Memilih Jawaban
   const handleSelectAnswer = (option) => {
-    if (isAnswered) return; // Cegah ubah jawaban jika sudah submit
-    
+    if (isAnswered) return;
     setStagedAnswers(prev => {
       if (isMultipleChoice) {
-        // Toggle selection untuk Multiple Choice
         if (prev.includes(option)) return prev.filter(item => item !== option);
         if (prev.length >= 2) { alert("Maksimal pilih 2 jawaban!"); return prev; }
         return [...prev, option];
       } else {
-        // Replace selection untuk Single Choice
         return [option];
       }
     });
     setStagedConfidence(null); 
   };
 
-  // Logic Submit via Tombol Confidence
   const handleSelectConfidence = (level) => {
-    window.speechSynthesis.cancel(); // Stop suara agar fokus
+    window.speechSynthesis.cancel();
     setIsSpeaking(false);
     setStagedConfidence(level);
     onAnswerSubmit(question.id, stagedAnswers, level);
   };
 
-  // Styling Dinamis
-  const cardBg = isDark ? 'bg-gray-800' : 'bg-white';
-  const textPrimary = isDark ? 'text-gray-100' : 'text-gray-900';
+  // STYLING UTAMA
+  const cardClasses = isDark 
+    ? 'bg-slate-800/60 backdrop-blur-xl border-slate-700 shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]' 
+    : 'bg-white/80 backdrop-blur-xl border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)]';
   
-  let statusBorder = "";
+  const textPrimary = isDark ? 'text-slate-100' : 'text-slate-800';
+  
+  // Border status card utama
+  let statusBorderClass = "border";
   if (isAnswered) {
-    if (answerStatus === 'correct') statusBorder = "border-2 border-green-500";
-    else if (answerStatus === 'partial') statusBorder = "border-2 border-orange-500";
-    else statusBorder = "border-2 border-red-500";
+    if (answerStatus === 'correct') statusBorderClass = "border-emerald-500 ring-1 ring-emerald-500/50 shadow-emerald-500/10";
+    else if (answerStatus === 'partial') statusBorderClass = "border-amber-500 ring-1 ring-amber-500/50 shadow-amber-500/10";
+    else statusBorderClass = "border-rose-500 ring-1 ring-rose-500/50 shadow-rose-500/10";
+  } else {
+    statusBorderClass = isDark ? "border-slate-700" : "border-slate-200";
   }
 
   return (
-    // Wrapper Full Height Flexbox
-    <div className={`w-full h-full flex flex-col ${cardBg} ${statusBorder} rounded-xl overflow-hidden transition-all duration-300 shadow-sm`}>
+    <div className={`w-full h-full flex flex-col ${cardClasses} ${statusBorderClass} rounded-2xl overflow-hidden transition-all duration-500`}>
       
-      {/* AREA SCROLLABLE (Header + Soal + Hint + Opsi) */}
-      <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
-        
-        <div className={`transition-opacity duration-300 ${showQuestion ? 'opacity-100' : 'opacity-0'}`}>
+      {/* Scroll Area */}
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar scroll-smooth">
+        <div className={`transition-all duration-500 ease-out transform ${showQuestion ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
           
-          {/* Header Bar: Topik & Action Buttons */}
-          <div className="flex justify-between items-start mb-3 gap-2">
+          {/*HEADER (Topic & Tools)*/}
+          <div className="flex justify-between items-center mb-6 gap-3">
             <div className="flex items-center gap-2">
                 {question.topic && (
-                <span className="bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide">
+                <span className={`text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-widest shadow-sm
+                  ${isDark ? 'bg-indigo-900/40 text-indigo-300 border border-indigo-500/30' : 'bg-indigo-50 text-indigo-600 border border-indigo-100'}`}>
                     {question.topic}
                 </span>
                 )}
-                
-                {/* Tombol Speaker */}
-                <button 
-                    onClick={handleToggleSpeech}
-                    className={`p-1 rounded-full transition-colors 
-                    ${isSpeaking ? 'text-blue-500 bg-blue-100 dark:bg-blue-900' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'}`}
-                    title={isSpeaking ? "Matikan Suara" : "Bacakan Soal & Opsi"}
-                >
-                    {isSpeaking ? <SpeakerWaveIcon /> : <SpeakerIcon />}
-                </button>
-
-                {/* Tombol Hint */}
+            </div>
+            
+            <div className="flex items-center gap-2">
                 {question.hint && (
                   <button 
                       onClick={() => setShowHint(!showHint)}
-                      className={`p-1 rounded-full transition-colors 
-                      ${showHint ? 'text-yellow-500 bg-yellow-100 dark:bg-yellow-900' : 'text-gray-400 hover:text-yellow-500'}`}
+                      className={`p-2 rounded-full transition-all duration-300 active:scale-90
+                      ${showHint 
+                        ? 'text-amber-500 bg-amber-100 dark:bg-amber-900/30 ring-2 ring-amber-200 dark:ring-amber-700' 
+                        : 'text-slate-400 hover:text-amber-500 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
                       title="Lihat Petunjuk"
                   >
                       <LightBulbIcon />
                   </button>
                 )}
+                
+                <button 
+                    onClick={handleToggleSpeech}
+                    className={`p-2 rounded-full transition-all duration-300 active:scale-90
+                    ${isSpeaking 
+                      ? 'text-blue-500 bg-blue-100 dark:bg-blue-900/30 ring-2 ring-blue-200 dark:ring-blue-700' 
+                      : 'text-slate-400 hover:text-blue-500 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+                    title={isSpeaking ? "Matikan Suara" : "Bacakan Soal"}
+                >
+                    {isSpeaking ? <SpeakerWaveIcon /> : <SpeakerIcon />}
+                </button>
             </div>
-            
-            <span className="text-[10px] font-bold text-gray-400 border border-gray-200 dark:border-gray-700 px-2 py-0.5 rounded">
-              {isMultipleChoice ? "Pilih Banyak" : "Pilih Satu"}
+          </div>
+
+          {/* QUESTION TEXT */}
+          <h2 className={`text-base sm:text-lg font-bold mb-2 leading-relaxed tracking-tight ${textPrimary}`}>
+            {question.question}
+          </h2>
+          
+          <div className="mb-6">
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded border 
+              ${isDark ? 'border-slate-600 text-slate-400' : 'border-slate-200 text-slate-500'}`}>
+              {isMultipleChoice ? "Pilih Lebih dari Satu" : "Pilih Satu Jawaban"}
             </span>
           </div>
 
-          {/* Teks Pertanyaan */}
-          <p className={`text-sm sm:text-base font-semibold mb-2 leading-relaxed ${textPrimary}`}>
-            {question.question}
-          </p>
-
-          {/* Kotak Hint */}
+          {/* HINT BOX */}
           {showHint && question.hint && (
-            <div className="mb-4 p-3 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 text-xs sm:text-sm text-yellow-800 dark:text-yellow-200 animate-fade-in-fast flex items-start gap-2">
-               <div className="mt-0.5 flex-shrink-0"><LightBulbIcon /></div>
-               <div className="italic"><span className="font-bold not-italic">Petunjuk:</span> {question.hint}</div>
+            <div className={`mb-6 p-4 rounded-xl border flex items-start gap-3 animate-slide-down
+              ${isDark ? 'bg-amber-900/10 border-amber-500/20 text-amber-200' : 'bg-amber-50 border-amber-200 text-amber-800'}`}>
+              <div className="mt-0.5 flex-shrink-0 text-amber-500"><LightBulbIcon /></div>
+              <div className="text-sm leading-relaxed"><span className="font-bold">Petunjuk:</span> {question.hint}</div>
             </div>
           )}
 
-          {/* Daftar Opsi Jawaban */}
-          <div className="space-y-2 pb-4 mt-4">
+          {/* OPTIONS LIST */}
+          <div className="space-y-3 pb-2">
             {question.options.map((option, index) => {
               const isCorrectOption = question.answer.includes(option);
               const isSelected = stagedAnswers.includes(option);
               const isUserFinalChoice = isAnswered && userAnswer.includes(option);
               
-              // Logic Pewarnaan Tombol
-              let styleClasses = "";
-              if (isAnswered) {
-                if (isCorrectOption) styleClasses = isDark ? "bg-green-900/30 border-green-500/50" : "bg-green-50 border-green-500";
-                else if (isUserFinalChoice && !isCorrectOption) styleClasses = isDark ? "bg-red-900/30 border-red-500/50" : "bg-red-50 border-red-500";
-                else styleClasses = isDark ? "bg-gray-700/50 border-gray-700 opacity-50" : "bg-gray-50 border-gray-200 opacity-60";
-              } else {
-                if (isSelected) styleClasses = "bg-blue-600 border-blue-600 text-white shadow-md";
-                else styleClasses = isDark ? "bg-gray-700 border-gray-600 hover:bg-gray-600 text-gray-200" : "bg-white border-gray-200 hover:border-blue-400 text-gray-700";
+              // Logic Styling Opsi
+              let containerClasses = `relative w-full p-4 border rounded-xl text-left transition-all duration-300 flex items-center gap-4 group `;
+              let iconClasses = "w-5 h-5 flex-shrink-0 flex items-center justify-center border transition-all duration-300 ";
+              
+              // Base State (Belum dijawab)
+              if (!isAnswered) {
+                if (isSelected) {
+                    // Selected State (Gradient Blue)
+                    containerClasses += "border-transparent bg-gradient-to-r from-blue-600 to-indigo-600 shadow-lg shadow-blue-500/30 translate-x-1";
+                    iconClasses += isMultipleChoice ? "rounded bg-white border-transparent" : "rounded-full bg-white border-transparent";
+                } else {
+                    // Default State
+                    containerClasses += isDark 
+                        ? "bg-slate-800/50 border-slate-700 hover:bg-slate-700 hover:border-slate-600 text-slate-300 hover:pl-5" 
+                        : "bg-white border-slate-200 hover:border-blue-300 hover:shadow-md text-slate-600 hover:pl-5";
+                    iconClasses += isMultipleChoice 
+                        ? `rounded border-slate-400 ${isDark ? 'group-hover:border-slate-300' : 'group-hover:border-blue-400'}` 
+                        : `rounded-full border-slate-400 ${isDark ? 'group-hover:border-slate-300' : 'group-hover:border-blue-400'}`;
+                }
+              } 
+              // Result State
+              else {
+                if (isCorrectOption) {
+                    // Jawaban Benar (Green)
+                    containerClasses += isDark 
+                        ? "bg-emerald-900/20 border-emerald-500/50 text-emerald-300" 
+                        : "bg-emerald-50 border-emerald-500 text-emerald-800 shadow-sm";
+                    iconClasses += "rounded-full border-emerald-500 bg-emerald-500 text-white";
+                } else if (isUserFinalChoice && !isCorrectOption) {
+                    // Jawaban User Salah (Red)
+                    containerClasses += isDark 
+                        ? "bg-rose-900/20 border-rose-500/50 text-rose-300" 
+                        : "bg-rose-50 border-rose-500 text-rose-800 shadow-sm";
+                    iconClasses += "rounded-full border-rose-500 bg-rose-500 text-white";
+                } else {
+                    // Opsi Lain (Dimmed)
+                    containerClasses += "opacity-50 grayscale border-transparent " + (isDark ? "bg-slate-800" : "bg-slate-100 text-slate-400");
+                    iconClasses += "rounded border-slate-300";
+                }
               }
 
               return (
@@ -211,31 +277,28 @@ function Question({ question, userAnswer, onAnswerSubmit, isDark }) {
                   key={index}
                   onClick={() => handleSelectAnswer(option)}
                   disabled={isAnswered}
-                  className={`relative w-full p-3 border rounded-lg text-left transition-all duration-200 flex items-start gap-3 ${styleClasses}`}
+                  className={containerClasses}
                   style={{ 
-                    opacity: showQuestion ? 1 : 0, 
-                    transform: showQuestion ? 'translateY(0)' : 'translateY(10px)',
-                    transitionDelay: `${index * 50}ms`
+                    animation: showQuestion ? `slideIn 0.5s ease-out ${index * 0.1}s backwards` : 'none'
                   }}
                 >
-                  {/* Indikator Pilihan (Bulat/Kotak) */}
-                  <div className={`mt-0.5 w-4 h-4 flex-shrink-0 flex items-center justify-center border transition-colors
-                    ${isMultipleChoice ? 'rounded' : 'rounded-full'}
-                    ${isSelected || isUserFinalChoice ? 'border-transparent bg-current' : 'border-gray-400'}
-                  `}>
-                     {(isSelected || isUserFinalChoice) && (
+                  {/* Icon Checkbox/Radio */}
+                  <div className={iconClasses}>
+                      {isAnswered && isCorrectOption && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+                      {isAnswered && isUserFinalChoice && !isCorrectOption && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg>}
+                      {!isAnswered && isSelected && (
                         isMultipleChoice 
-                        ? <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" /></svg>
-                        : <div className="w-2 h-2 bg-white rounded-full" />
-                     )}
+                        ? <svg className={`w-3 h-3 ${isSelected ? 'text-blue-600' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" /></svg>
+                        : <div className="w-2 h-2 bg-blue-600 rounded-full" />
+                      )}
                   </div>
                   
-                  {/* Teks Opsi */}
-                  <span className={`text-xs sm:text-sm font-medium flex-1 ${isSelected && !isAnswered ? 'text-white' : ''}`}>{option}</span>
+                  <span className={`text-sm font-medium flex-1 leading-snug ${isSelected && !isAnswered ? 'text-white' : ''}`}>
+                    {option}
+                  </span>
                   
-                  {/* Icon Feedback (Benar/Salah) */}
-                  {isAnswered && isCorrectOption && <CheckIcon />}
-                  {isAnswered && isUserFinalChoice && !isCorrectOption && <XIcon />}
+                  {isAnswered && isCorrectOption && <div className="animate-scale-in"><CheckIcon /></div>}
+                  {isAnswered && isUserFinalChoice && !isCorrectOption && <div className="animate-scale-in"><XIcon /></div>}
                 </button>
               );
             })}
@@ -243,34 +306,49 @@ function Question({ question, userAnswer, onAnswerSubmit, isDark }) {
         </div>
       </div>
 
-      {/* FOOTER AREA (Fixed Bottom) */}
+      {/* FOOTER AREA */}
       {(stagedAnswers.length > 0 || isAnswered) && (
-        <div className={`flex-shrink-0 p-3 border-t ${isDark ? 'bg-gray-900/50 border-gray-700' : 'bg-gray-50 border-gray-100'}`}>
+        <div className={`flex-shrink-0 p-4 sm:p-5 border-t backdrop-blur-md transition-all duration-500
+            ${isDark ? 'bg-slate-900/40 border-slate-700/50' : 'bg-slate-50/80 border-slate-200'}`}>
           
-          {/* SELEKSI KEYAKINAN (Sebelum Submit) */}
+          {/* CONFIDENCE SELECTOR */}
           {!isAnswered && stagedAnswers.length > 0 && (
-            <div className="animate-fade-in-fast">
-              <p className={`text-[10px] sm:text-xs font-bold text-center mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-                Seberapa yakin Anda?
-              </p>
-              <div className="flex gap-2">
-                <ConfidenceButton text="Ragu 🤔" onClick={() => handleSelectConfidence(0.5)} isSelected={stagedConfidence === 0.5} colorBase="yellow" isDark={isDark} />
-                <ConfidenceButton text="Yakin 🚀" onClick={() => handleSelectConfidence(1.0)} isSelected={stagedConfidence === 1.0} colorBase="green" isDark={isDark} />
+            <div className="animate-fade-in-up">
+              <div className="flex justify-between items-end mb-3">
+                  <p className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                    Konfirmasi Jawaban
+                  </p>
+                  <span className="text-[10px] opacity-60">Seberapa yakin Anda?</span>
+              </div>
+              <div className="flex gap-3">
+                <ConfidenceButton text="🤔 Masih Ragu" onClick={() => handleSelectConfidence(0.5)} isSelected={stagedConfidence === 0.5} colorBase="yellow" isDark={isDark} />
+                <ConfidenceButton text="🎯 Sangat Yakin" onClick={() => handleSelectConfidence(1.0)} isSelected={stagedConfidence === 1.0} colorBase="green" isDark={isDark} />
               </div>
             </div>
           )}
 
-          {/* PENJELASAN (Setelah Submit) */}
+          {/* FEEDBACK & EXPLANATION (Hasil) */}
           {isAnswered && (
-             <div className={`rounded p-3 text-xs sm:text-sm leading-relaxed border-l-4 animate-fade-in overflow-y-auto max-h-32 custom-scrollbar
-                ${answerStatus === 'correct' ? (isDark ? 'bg-green-900/30 border-green-500 text-green-200' : 'bg-green-50 border-green-500 text-green-800') 
-                : answerStatus === 'partial' ? (isDark ? 'bg-orange-900/30 border-orange-500 text-orange-200' : 'bg-orange-50 border-orange-500 text-orange-800')
-                : (isDark ? 'bg-red-900/30 border-red-500 text-red-200' : 'bg-red-50 border-red-500 text-red-800')}`}>
-                <span className="font-bold block mb-1">
-                  {answerStatus === 'correct' ? '🎉 Benar!' : answerStatus === 'partial' ? '⚠️ Kurang Tepat' : '😅 Salah'}
-                </span>
-                {question.explanation}
-             </div>
+            <div className={`rounded-2xl p-4 sm:p-5 text-sm leading-relaxed border shadow-sm animate-fade-in-up overflow-hidden relative
+                ${answerStatus === 'correct' 
+                    ? (isDark ? 'bg-gradient-to-br from-emerald-900/40 to-emerald-900/10 border-emerald-500/30 text-emerald-100' : 'bg-gradient-to-br from-emerald-50 to-white border-emerald-200 text-emerald-900') 
+                : answerStatus === 'partial' 
+                    ? (isDark ? 'bg-gradient-to-br from-amber-900/40 to-amber-900/10 border-amber-500/30 text-amber-100' : 'bg-gradient-to-br from-amber-50 to-white border-amber-200 text-amber-900')
+                : (isDark ? 'bg-gradient-to-br from-rose-900/40 to-rose-900/10 border-rose-500/30 text-rose-100' : 'bg-gradient-to-br from-rose-50 to-white border-rose-200 text-rose-900')}`}>
+                
+                {/* Dekorasi Background */}
+                <div className={`absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 rounded-full blur-2xl opacity-20 
+                    ${answerStatus === 'correct' ? 'bg-emerald-400' : answerStatus === 'partial' ? 'bg-amber-400' : 'bg-rose-400'}`}></div>
+
+                <div className="relative z-10">
+                    <div className="flex items-center gap-2 mb-2">
+                        {answerStatus === 'correct' ? <CheckIcon /> : answerStatus === 'partial' ? <WarningIcon /> : <XIcon />}
+                        <span className="font-bold text-base tracking-tight">{feedbackText}</span>
+                    </div>
+                    <div className={`w-full h-px mb-3 ${isDark ? 'bg-white/10' : 'bg-black/5'}`}></div>
+                    <p className="opacity-90 font-light">{question.explanation}</p>
+                </div>
+            </div>
           )}
         </div>
       )}

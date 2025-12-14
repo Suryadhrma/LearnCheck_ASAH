@@ -8,13 +8,12 @@ function Quiz({ questions, userAnswers, onAnswerChange, onSubmit }) {
   const allAnswered = answeredCount === questions.length;
 
   return (
-    // 'form' agar kita bisa menggunakan onSubmit
     <form onSubmit={onSubmit}>
       {/* Daftar semua pertanyaan */}
       <div className="space-y-8">
         {questions.map((q) => (
           <Question
-            key={q.id} // Gunakan ID dari data jika tersedia
+            key={q.id} 
             question={q}
             // Kirim jawaban yang sudah dipilih untuk pertanyaan ini
             selectedAnswer={userAnswers[q.id] || null}
