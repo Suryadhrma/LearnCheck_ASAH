@@ -130,22 +130,22 @@ Visualisasi progress belajar menggunakan grafik riwayat dan breakdown analisis p
 
 ### Built With 🛠
 Frontend
-[React] (https://react.dev/) - Library JavaScript untuk antarmuka pengguna.
+[React](https://react.dev/) - Library JavaScript untuk antarmuka pengguna.
 
-[Vite] (https://vite.dev/) - Build tool frontend generasi berikutnya.
+[Vite](https://vite.dev/) - Build tool frontend generasi berikutnya.
 
-[Tailwind CSS] (https://tailwindcss.com/) - Framework CSS utility-first untuk styling cepat.
+[Tailwind CSS](https://tailwindcss.com/) - Framework CSS utility-first untuk styling cepat.
 
-[Axios] (https://axios-http.com/) - HTTP Client untuk request ke backend.
+[Axios](https://axios-http.com/) - HTTP Client untuk request ke backend.
 
 Backend
-[Express.js] (https://expressjs.com/) - Framework web minimalis untuk Node.js.
+[Express.js](https://expressjs.com/) - Framework web minimalis untuk Node.js.
 
-[Groq SDK] (https://console.groq.com/) - Integrasi High-performance AI inference (Llama-3).
+[Groq SDK](https://console.groq.com/) - Integrasi High-performance AI inference (Llama-3).
 
-[Cheerio] (https://cheerio.js.org/) - Scraping dan parsing konten HTML materi.
+[Cheerio](https://cheerio.js.org/) - Scraping dan parsing konten HTML materi.
 
-[Cors & Dotenv] (https://www.npmjs.com/) - Keamanan dan manajemen konfigurasi.
+[Cors & Dotenv](https://www.npmjs.com/) - Keamanan dan manajemen konfigurasi.
 
 ---
 
