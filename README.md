@@ -144,7 +144,7 @@ Visualisasi progress belajar menggunakan grafik riwayat dan breakdown analisis p
     <tr>
       <td align="center">
         <img src="/screenshots/single_correct.jfif" alt="Jawaban Benar" width="200px" />
-        <br /><b>Feedback Benar</b>
+        <br /><b>Feedback Single</b>
       </td>
       <td align="center">
         <img src="/screenshots/multiple_answer.jfif" alt="Multiple Answer" width="200px" />
