@@ -9,7 +9,7 @@
 
 ## Our Team
 
-| Name | Bangkit-ID | Role |
+| Name | Asah-ID | Role |
 | :--- | :--- | :--- |
 | **Gericho Chandra Diva Pratama Hutagalung** | R429D5Y0684 | UI/UX & Styling |
 | **Lucky Ferdiansyah** | R429D5Y1006 | React / Frontend Dev |
@@ -38,9 +38,10 @@ cd backend
 
 # Install dependencies
 npm install
+npm install groq-sdk
 
 # Buat file .env dan isi konfigurasi berikut:
-# GROQ_API_KEY=your_groq_api_key_here
+# GROQ_API_KEY= your_groq_api_key_here
 # PORT=5000
 
 # Jalankan Server
@@ -65,38 +66,39 @@ Akses aplikasi melalui browser di http://localhost:5173.
 
 ### Usage
 How to Start a Quiz
-Pilih Tingkat Kesulitan:
+- Pilih Tingkat Kesulitan:
 
-Mudah: Fokus pada pemahaman dasar (Recall & Understand).
+  - Mudah: Fokus pada pemahaman dasar (Recall & Understand).
 
-Sulit: Fokus pada studi kasus dan analisis (Analyze & Evaluate).
+  - Sulit: Fokus pada studi kasus dan analisis (Analyze & Evaluate).
 
-Mulai Kuis:
+- Mulai Kuis:
 
-Klik tombol "Mulai Sekarang". Aplikasi akan mengambil materi dari sumber belajar dan AI akan men-generate soal secara real-time.
+- Klik tombol "Mulai Sekarang". Aplikasi akan mengambil materi dari sumber belajar dan AI akan men-generate soal secara real-time.
 
-Jawab Pertanyaan:
+- Jawab Pertanyaan:
 
-Pilih jawaban yang menurut Anda benar.
+  - Pilih jawaban yang menurut Anda benar.
 
-Confidence Check: Tentukan apakah Anda "Sangat Yakin" atau "Masih Ragu". Ini mempengaruhi analisis akhir.
+- Confidence Check: Tentukan apakah Anda "Sangat Yakin" atau "Masih Ragu". Ini mempengaruhi analisis akhir.
 
-Understanding the Result
-Setelah kuis selesai, Anda akan mendapatkan laporan analisis:
+- Understanding the Result
 
-Skor Akhir: Persentase jawaban benar.
+- Setelah kuis selesai, Anda akan mendapatkan laporan analisis:
 
-Matriks Pemahaman:
+- Skor Akhir: Persentase jawaban benar.
 
- Paham: Jawaban benar & yakin.
+- Matriks Pemahaman:
 
- Hoki: Jawaban benar tapi ragu (perlu dipelajari lagi).
+  - Paham: Jawaban benar & yakin.
 
- Kurang Tepat: Jawaban hampir benar (parsial).
+  - Hoki: Jawaban benar tapi ragu (perlu dipelajari lagi).
 
- Salah: Jawaban salah & yakin (miskonsepsi).
+  - Kurang Tepat: Jawaban hampir benar (parsial).
 
-Rekomendasi: Daftar soal yang perlu ditinjau ulang beserta penjelasan AI.
+  - Salah: Jawaban salah & yakin (miskonsepsi).
+
+- Rekomendasi: Daftar soal yang perlu ditinjau ulang beserta penjelasan AI.
 
 ---
 
@@ -129,7 +131,7 @@ Visualisasi progress belajar menggunakan grafik riwayat dan breakdown analisis p
 
 
 ### Built With 🛠
-Frontend
+### Frontend
 [React](https://react.dev/) - Library JavaScript untuk antarmuka pengguna.
 
 [Vite](https://vite.dev/) - Build tool frontend generasi berikutnya.
@@ -138,7 +140,7 @@ Frontend
 
 [Axios](https://axios-http.com/) - HTTP Client untuk request ke backend.
 
-Backend
+### Backend
 [Express.js](https://expressjs.com/) - Framework web minimalis untuk Node.js.
 
 [Groq SDK](https://console.groq.com/) - Integrasi High-performance AI inference (Llama-3).
