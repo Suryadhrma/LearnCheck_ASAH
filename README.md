@@ -32,6 +32,8 @@ Pastikan Anda telah menginstal software berikut sebelum memulai:
 ### 1. Setup Backend (Server)
 Backend dibangun menggunakan Express.js dan bertugas menangani integrasi AI (Groq/Llama-3) serta scraping materi.
 
+Link llama-3.3-70b-versatile via Groq : https://console.groq.com/playground?model=llama-3.3-70b-versatile
+
 ```bash
 # Masuk ke folder backend (sesuaikan dengan struktur folder Anda)
 cd backend
