@@ -126,6 +126,11 @@ Visualisasi progress belajar menggunakan grafik riwayat dan breakdown analisis p
 
 ### 📸 Screenshots
 
+<div align="center">
+  <img src="/screenshots/page1.jfif" alt="LearnCheck AI Logo" width="150"/>
+  <h1><b>LearnCheck AI : Platform Evaluasi Belajar Cerdas & Adaptif</b></h1>
+</div>
+
 
 ---
 
