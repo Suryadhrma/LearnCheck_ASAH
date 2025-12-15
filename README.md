@@ -124,11 +124,52 @@ Visualisasi progress belajar menggunakan grafik riwayat dan breakdown analisis p
 
 ---
 
-### 📸 Screenshots
-
 <div align="center">
-  <img src="/screenshots/page1.jfif" alt="LearnCheck AI Logo" width="150"/>
-  <h1><b>LearnCheck AI : Platform Evaluasi Belajar Cerdas & Adaptif</b></h1>
+  <h2>📸 Screen Preview</h2>
+  <table>
+    <tr>
+      <td align="center">
+        <img src="/screenshots/page1.jfif" alt="Halaman Awal" width="200px" />
+        <br /><b>Halaman Awal</b>
+      </td>
+      <td align="center">
+        <img src="/screenshots/soal_kosong.jpeg" alt="Tampilan Soal" width="200px" />
+        <br /><b>Tampilan Soal</b>
+      </td>
+      <td align="center">
+        <img src="/screenshots/single_answer.jfif" alt="Pilih Jawaban" width="200px" />
+        <br /><b>Single Answer</b>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        <img src="/screenshots/single_correct.jfif" alt="Jawaban Benar" width="200px" />
+        <br /><b>Feedback Benar</b>
+      </td>
+      <td align="center">
+        <img src="/screenshots/multiple_answer.jfif" alt="Multiple Answer" width="200px" />
+        <br /><b>Multiple Choice</b>
+      </td>
+      <td align="center">
+        <img src="/screenshots/multiple_correct.jfif" alt="Multiple Correct" width="200px" />
+        <br /><b>Feedback Multiple</b>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        <img src="/screenshots/result.jfif" alt="Hasil Quiz" width="200px" />
+        <br /><b>Halaman Hasil</b>
+      </td>
+      <td align="center">
+        <img src="/screenshots/ai_tutor.jfif" alt="AI Tutor" width="200px" />
+        <br /><b>AI Tutor</b>
+      </td>
+      <td align="center">
+        <img src="/screenshots/ringkasan_ai.jfif" alt="Ringkasan AI" width="200px" />
+        <br /><b>Ringkasan Materi</b>
+      </td>
+    </tr>
+  </table>
 </div>
 
 
